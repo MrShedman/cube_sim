@@ -4,7 +4,7 @@ import OpenGL.GL as GL
 import OpenGL.GLU as GLU
 import ctypes
 import glm
-from vbo import VBO
+from cube_sim.vbo import VBO
 from OpenGL.arrays import vbo
 import numpy as np
 

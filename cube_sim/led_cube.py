@@ -5,8 +5,8 @@ import numpy as np
 from enum import IntEnum
 from math import sqrt
 
-from transform import Transform
-from mesh import Mesh
+from cube_sim.transform import Transform
+from cube_sim.mesh import Mesh
 
 class Face(IntEnum):
     TOP = 0

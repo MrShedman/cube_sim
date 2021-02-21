@@ -11,13 +11,13 @@ import OpenGL.GLU as GLU
 import numpy as np
 import glm
 
-from transform import Transform
-from shader import Shader
-from camera import Camera
-from mesh import Mesh
-from mesh_view import MeshView
-from led_cube import LEDCube
-from grid import Grid
+from cube_sim.transform import Transform
+from cube_sim.shader import Shader
+from cube_sim.camera import Camera
+from cube_sim.mesh import Mesh
+from cube_sim.mesh_view import MeshView
+from cube_sim.led_cube import LEDCube
+from cube_sim.grid import Grid
 
 class Application():
     def __init__(self):

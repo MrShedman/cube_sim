@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from transform import Transform
+from cube_sim.transform import Transform
 from math import sin, cos, radians, pi
 from time import time
 import pygame as pg
