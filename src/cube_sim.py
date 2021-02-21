@@ -38,6 +38,7 @@ class Application():
         self.grid.build()
 
         self.wireframe = True
+        self.cube_state = True
 
         GL.glEnable(GL.GL_DEPTH_TEST)
         GL.glEnable(GL.GL_STENCIL_TEST)
@@ -56,7 +57,13 @@ class Application():
             if (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
                 self.close()
             if (event.type == pg.KEYDOWN and event.key == pg.K_m):
-                self.wireframe = not self.wireframe           
+                self.wireframe = not self.wireframe  
+            if (event.type == pg.KEYDOWN and event.key == pg.K_c):
+                self.cube_state = not self.cube_state 
+                if self.cube_state:
+                    self.sphere.makeCube()
+                else:
+                    self.sphere.makeSphere()          
             if event.type == pg.WINDOWRESIZED:
                 GL.glViewport(0, 0, event.dict['x'], event.dict['y'])
             self.camera.handleEvent(event)
