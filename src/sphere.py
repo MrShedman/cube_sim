@@ -15,7 +15,11 @@ class Sphere(Transform):
 
     def addVertex(self, x, y, z, normal):
         self.count += 1
-        self.mesh.addVertex(x, y, z, normal[0], normal[1], normal[2], normal[0], normal[1], normal[2], 1.0)
+        self.mesh.addVertex(x, y, z, normal[0], normal[1], normal[2], normal[0], normal[1], normal[2])
+
+    def update(self):
+        self.mesh.colours = np.random.uniform(0,1,(len(self.mesh.colours), 3)).astype(np.float32)
+        self.mesh.updateColours()
 
     def buildFromCube(self):
         self.mesh = Mesh(6 * 6 * self.subdivision * self.subdivision)
@@ -125,11 +129,8 @@ class Sphere(Transform):
 
         self.mesh.indices = np.linspace(0, len(self.mesh.indices), len(self.mesh.indices), False, dtype=np.uint32)
 
-        for i, colour in enumerate(self.mesh.vertices["colour"]):
-            self.mesh.vertices["colour"][i] = np.absolute(colour)
-
-        for i, position in enumerate(self.mesh.vertices["position"]):
-            self.mesh.vertices["position"][i] = np.array(glm.normalize(glm.vec3(position)) * self.radius)
-            self.mesh.vertices["normal"][i] = np.array(glm.normalize(glm.vec3(position)))
+        self.mesh.colours = np.absolute(self.mesh.colours)
+        self.mesh.positions = self.mesh.positions / np.linalg.norm(self.mesh.positions, axis=1, keepdims=True)
+        self.mesh.normals = self.mesh.positions
 
         self.mesh.complete()

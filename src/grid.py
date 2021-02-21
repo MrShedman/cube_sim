@@ -14,7 +14,7 @@ class Grid(Transform):
         self.count = 0
 
     def addVertex(self, x, y, z):
-        self.mesh.addVertex(x, y, z, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+        self.mesh.addVertex(x, y, z, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0)
         self.mesh.addIndex(self.count)
         self.count += 1
 

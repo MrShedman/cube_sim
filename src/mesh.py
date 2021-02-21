@@ -10,20 +10,22 @@ import numpy as np
 
 class Mesh():
     def __init__(self, size):
-        self.vbo = VBO(GL.GL_ARRAY_BUFFER, GL.GL_STATIC_DRAW)
-        self.ibo = VBO(GL.GL_ELEMENT_ARRAY_BUFFER, GL.GL_STATIC_DRAW)
         self.mode = GL.GL_TRIANGLES
         self.vcount = 0
         self.icount = 0
 
-        self.vertices = np.zeros(size, [("position", np.float32, 3),("normal", np.float32, 3), ("colour", np.float32, 4)])
+        self.positions = np.zeros(size, dtype=(np.float32, 3))
+        self.normals = np.zeros(size, dtype=(np.float32, 3))
+        self.colours = np.zeros(size, dtype=(np.float32, 3))
         self.indices = np.zeros(size, dtype=np.uint32)
 
     # def __del__(self):
     #     GL.glDeleteVertexArrays(1, [self.vao])
         
-    def addVertex(self, x, y, z, nx, ny, nz, r, g, b, a):
-        self.vertices[self.vcount] = np.array([([x, y, z], [nx, ny, nz], [r, g, b, a])], dtype=self.vertices.dtype)
+    def addVertex(self, x, y, z, nx, ny, nz, r, g, b):
+        self.positions[self.vcount] = np.array([x, y, z])
+        self.normals[self.vcount] = np.array([nx, ny, nz])
+        self.colours[self.vcount] = np.array([r, g, b])
         self.vcount += 1
 
     def addIndex(self, i):
@@ -33,41 +35,38 @@ class Mesh():
     def complete(self):
         self.vao = GL.glGenVertexArrays(1)
         GL.glBindVertexArray(self.vao)
-
-        self.vbo.data(self.vertices.nbytes, self.vertices)
-        self.ibo.data(self.indices.nbytes, self.indices)
-
-        self.vbo.bind()
-        self.ibo.bind()
-
-        stride = self.vertices.strides[0]
-
+        
+        self.vbo_position = VBO(GL.GL_ARRAY_BUFFER, GL.GL_DYNAMIC_DRAW)
+        self.vbo_position.data(self.positions.nbytes, self.positions)
         GL.glEnableVertexAttribArray(0)
-        GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, False, stride, ctypes.c_void_p(0))
-
+        GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, False, 12, None)
+        
+        self.vbo_normal = VBO(GL.GL_ARRAY_BUFFER, GL.GL_DYNAMIC_DRAW)
+        self.vbo_normal.data(self.normals.nbytes, self.normals)
         GL.glEnableVertexAttribArray(1)
-        GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, False, stride, ctypes.c_void_p(12))
-
+        GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, False, 12, None)
+        
+        self.vbo_colour = VBO(GL.GL_ARRAY_BUFFER, GL.GL_DYNAMIC_DRAW)
+        self.vbo_colour.data(self.colours.nbytes, self.colours)
         GL.glEnableVertexAttribArray(2)
-        GL.glVertexAttribPointer(2, 4, GL.GL_FLOAT, False, stride, ctypes.c_void_p(24))
+        GL.glVertexAttribPointer(2, 3, GL.GL_FLOAT, False, 12, None)
+
+        self.ibo = VBO(GL.GL_ELEMENT_ARRAY_BUFFER, GL.GL_STATIC_DRAW)
+        self.ibo.data(self.indices.nbytes, self.indices)
 
         GL.glBindVertexArray(0)
 
-    def update(self):
-        self.vbo.sub_data(self.vertices.nbytes, self.vertices)
-        self.ibo.sub_data(self.indices.nbytes, self.indices)
+    def updatePositions(self):
+        if len(self.positions) == self.vcount:
+            self.vbo_position.sub_data(self.positions.nbytes, self.positions)
 
-    def getVertex(self, id):
-        return self.vertices[id]
+    def updateNormals(self):
+        if len(self.normals) == self.vcount:
+            self.vbo_normal.sub_data(self.normals.nbytes, self.normals)
 
-    def getPosition(self, id):
-        return self.getVertex(id)[0]
-
-    def getNormal(self, id):
-        return self.getVertex(id)[1]
-
-    def getColour(self, id):
-        return self.getVertex(id)[2]
+    def updateColours(self):
+        #if len(self.colours) == self.vcount:
+        self.vbo_colour.sub_data(self.colours.nbytes, self.colours)
 
     def draw(self):
         GL.glBindVertexArray(self.vao)

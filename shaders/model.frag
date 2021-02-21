@@ -4,7 +4,7 @@ out vec4 colour;
 
 in vec3 frag_pos;  
 in vec3 frag_normal;  
-in vec4 frag_colour;
+in vec3 frag_colour;
 
 uniform vec3 lightPos; 
 uniform vec3 viewPos;
@@ -32,11 +32,11 @@ void main()
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
 	vec3 specular = specularStrength * spec * lightColour; 
 
-	vec3 result = (ambient + diffuse + specular) * frag_colour.rgb;
+	vec3 result = (ambient + diffuse + specular) * frag_colour;
 
     float dist = distance(viewPos, frag_pos);
  
 	float opacity = clamp(dist / 50.0f, 0.0f, 1.0f) * fade;
 
-	colour = vec4(result * wireframe, frag_colour.a - opacity);
+	colour = vec4(result * wireframe, 1.0 - opacity);
 }
