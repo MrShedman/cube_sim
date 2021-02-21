@@ -9,8 +9,8 @@ class VBO:
         self.usage = usage
         self.vbo = GL.glGenBuffers(1)
 
-    # def __del__(self):
-    #     GL.glDeleteBuffers(1, [self.vbo])
+    def __del__(self):
+        GL.glDeleteBuffers(1, [self.vbo])
 
     def bind(self):
         GL.glBindBuffer(self.target, self.vbo)

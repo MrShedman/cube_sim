@@ -34,8 +34,8 @@ void main()
     vec3 result = (ambient + diffuse + specular) * frag_colour;
     
     float dist = distance(viewPos, frag_pos);
- 
-	float opacity = clamp(dist / 50.0f, 0.0f, 1.0f) * fade;
 
-	colour = vec4(result * wireframe, 1.0 - opacity);
+    float opacity = clamp(dist / 50.0f, 0.0f, 1.0f) * fade;
+
+    colour = vec4(result * wireframe, 1.0 - opacity);
 }

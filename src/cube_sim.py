@@ -22,24 +22,7 @@ class Application():
     def __init__(self):
         self.is_open = True
         self.timePerFrame = 1.0 / 60.0
-        
-        pg.init()
-
-        gl_version = (3, 2)
-
-        pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, gl_version[0])
-        pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, gl_version[1])
-        pg.display.gl_set_attribute(
-            pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE
-        )
-
-        pg.display.gl_set_attribute(pg.GL_MULTISAMPLEBUFFERS, 1)
-        pg.display.gl_set_attribute(pg.GL_MULTISAMPLESAMPLES, 4)
-
-        display_size = (1280, 720)
-        pg.display.set_mode(display_size, pg.OPENGL | pg.DOUBLEBUF | pg.RESIZABLE)
-        pg.display.set_caption('led cube simulator')
-        
+                
         self.rotation = Transform()
         self.camera = Camera()
         self.camera.setPosition(glm.vec3(-3.0, 0.0, 0.0))
@@ -109,11 +92,30 @@ class Application():
             self.render()
             pg.display.flip()
 
-        pg.quit()
-
     def close(self):
         self.is_open = False
 
 if __name__ == "__main__":
+
+    pg.init()
+
+    gl_version = (3, 2)
+
+    pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, gl_version[0])
+    pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, gl_version[1])
+    pg.display.gl_set_attribute(pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE)
+    pg.display.gl_set_attribute(pg.GL_MULTISAMPLEBUFFERS, 1)
+    pg.display.gl_set_attribute(pg.GL_MULTISAMPLESAMPLES, 4)
+    pg.display.gl_set_attribute(pg.GL_DOUBLEBUFFER, 1)
+    pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)
+    pg.display.gl_set_attribute(pg.GL_STENCIL_SIZE, 8)
+
+    display_size = (1280, 720)
+    pg.display.set_mode(display_size, pg.OPENGL | pg.DOUBLEBUF | pg.RESIZABLE)
+    pg.display.set_caption('led cube simulator')
+
     app = Application()
     app.run()
+    del app
+    
+    pg.quit()

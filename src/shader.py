@@ -10,8 +10,8 @@ class Shader():
         self.load(vertexFilename, fragmentFilename)
         self.uniforms = dict()
 
-    # def __del__(self):
-    #     GL.glDeleteProgram(1, [self.program])
+    def __del__(self):
+        GL.glDeleteProgram(self.program)
 
     def name(self):
         return self.program

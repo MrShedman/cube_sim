@@ -19,8 +19,8 @@ class Mesh():
         self.colours = np.zeros(size, dtype=(np.float32, 3))
         self.indices = np.zeros(size, dtype=np.uint32)
 
-    # def __del__(self):
-    #     GL.glDeleteVertexArrays(1, [self.vao])
+    def __del__(self):
+        GL.glDeleteVertexArrays(1, [self.vao])
         
     def addVertex(self, x, y, z, nx, ny, nz, r, g, b):
         self.positions[self.vcount] = np.array([x, y, z])
