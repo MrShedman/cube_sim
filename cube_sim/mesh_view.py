@@ -3,9 +3,9 @@
 import OpenGL.GL as GL
 import OpenGL.GLU as GLU
 import glm
-from mesh import Mesh
-from shader import Shader
-from camera import Camera
+from cube_sim.mesh import Mesh
+from cube_sim.shader import Shader
+from cube_sim.camera import Camera
 
 class MeshView():
     def __init__(self, renderable, shader, camera):

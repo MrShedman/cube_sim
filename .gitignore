@@ -1,2 +1,4 @@
 __pycache__
 .vscode
+/cube_sim_env
+*.egg-info

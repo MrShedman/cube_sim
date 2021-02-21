@@ -4,8 +4,8 @@ import glm
 import numpy as np
 import OpenGL.GL as GL
 
-from transform import Transform
-from mesh import Mesh
+from cube_sim.transform import Transform
+from cube_sim.mesh import Mesh
 
 class Grid(Transform):
     def __init__(self, interval = 0.5, extent = 50.0):
