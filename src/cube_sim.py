@@ -3,6 +3,7 @@
 import math
 import time
 import ctypes
+import signal
 
 import pygame as pg
 import OpenGL.GL as GL
@@ -22,6 +23,7 @@ class Application():
     def __init__(self):
         self.is_open = True
         self.timePerFrame = 1.0 / 60.0
+        signal.signal(signal.SIGINT, self.close)
                 
         self.rotation = Transform()
         self.camera = Camera()
@@ -92,7 +94,7 @@ class Application():
             self.render()
             pg.display.flip()
 
-    def close(self):
+    def close(self, signum = 0, frame = 0):
         self.is_open = False
 
 if __name__ == "__main__":
