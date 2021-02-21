@@ -2,7 +2,7 @@
 Introduction goes here
 
 ## Installation
-Clone it
+Clone it and open terminal in the directory.
 then run
 ```bash
 pip install -e .
