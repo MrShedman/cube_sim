@@ -18,8 +18,9 @@ class Sphere(Transform):
         self.mesh.addVertex(x, y, z, normal[0], normal[1], normal[2], normal[0], normal[1], normal[2])
 
     def update(self):
-        self.mesh.colours = np.random.uniform(0,1,(len(self.mesh.colours), 3)).astype(np.float32)
-        self.mesh.updateColours()
+        pass
+        #self.mesh.colours = np.random.uniform(0,1,(len(self.mesh.colours), 3)).astype(np.float32)
+        #self.mesh.updateColours()
 
     def buildFromCube(self):
         self.mesh = Mesh(6 * 6 * self.subdivision * self.subdivision)

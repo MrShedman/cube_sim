@@ -68,15 +68,15 @@ class Shader():
 
     def setUniform2f(self, uniform, vec2f):
         self.cacheUniform(uniform)
-        GL.glUniform2f(self.uniforms[uniform], vec2f.x, vec2f.y)
+        GL.glUniform2f(self.uniforms[uniform], vec2f[0], vec2f[1])
 
     def setUniform3f(self, uniform, vec3f):
         self.cacheUniform(uniform)
-        GL.glUniform3f(self.uniforms[uniform], vec3f.x, vec3f.y, vec3f.z)
+        GL.glUniform3f(self.uniforms[uniform], vec3f[0], vec3f[1], vec3f[2])
 
     def setUniform4f(self, uniform, vec4f):
         self.cacheUniform(uniform)
-        GL.glUniform4f(self.uniforms[uniform], vec4f.x, vec4f.y, vec4f.z, vec4f.w)
+        GL.glUniform4f(self.uniforms[uniform], vec4f[0], vec4f[1], vec4f[2], vec4f[3])
 
     def setUniformMatrix4f(self, uniform, mat4x4):
         self.cacheUniform(uniform)
