@@ -31,13 +31,14 @@ class Application():
 
         self.shader = Shader('shaders/model.vert', 'shaders/model.frag')
 
-        self.led_cube = LEDCube(16)
+        self.led_cube = LEDCube(64)
         self.led_cube.buildMesh()
+        self.led_cube.buildMeshOutline()
 
         self.grid = Grid()
         self.grid.buildMesh()
 
-        self.wireframe = True
+        self.wireframe = False
         self.cube_state = True
 
         GL.glEnable(GL.GL_DEPTH_TEST)
@@ -69,8 +70,8 @@ class Application():
             self.camera.handleEvent(event)
 
     def update(self, dt):
-        self.led_cube.rotateAngleAxis(dt * 0.1, glm.vec3(0.0, 1.0, 0.0))
-        self.led_cube.rotateAngleAxis(dt * 0.1, glm.vec3(1.0, 0.0, 0.0))
+        #self.led_cube.rotateAngleAxis(dt * 0.1, glm.vec3(0.0, 1.0, 0.0))
+        #self.led_cube.rotateAngleAxis(dt * 0.1, glm.vec3(1.0, 0.0, 0.0))
 
         self.led_cube.update()
 
