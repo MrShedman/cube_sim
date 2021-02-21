@@ -18,7 +18,7 @@ class Grid(Transform):
         self.mesh.addIndex(self.count)
         self.count += 1
 
-    def build(self):
+    def buildMesh(self):
         extent = 100
         segments, step = np.linspace(-extent, extent, int(extent / self.interval), False, True)
 

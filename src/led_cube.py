@@ -16,10 +16,9 @@ class Face(IntEnum):
     LEFT = 4
     RIGHT = 5
 
-class Sphere(Transform):
-    def __init__(self, radius, subdivision):
+class LEDCube(Transform):
+    def __init__(self, subdivision):
         super().__init__()
-        self.radius = radius
         self.subdivision = subdivision
         self.count = 0
 
@@ -53,7 +52,7 @@ class Sphere(Transform):
         self.mesh.updatePositions()
         self.mesh.updateNormals()
 
-    def buildFromCube(self):
+    def buildMesh(self):
         self.mesh = Mesh(6 * 6 * self.subdivision * self.subdivision)
 
         segments, step = np.linspace(-1, 1, self.subdivision, False, True)

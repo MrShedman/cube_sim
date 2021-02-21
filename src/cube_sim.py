@@ -16,7 +16,7 @@ from shader import Shader
 from camera import Camera
 from mesh import Mesh
 from mesh_view import MeshView
-from sphere import Sphere
+from led_cube import LEDCube
 from grid import Grid
 
 class Application():
@@ -31,11 +31,11 @@ class Application():
 
         self.shader = Shader('shaders/model.vert', 'shaders/model.frag')
 
-        self.sphere = Sphere(1.0, 16)
-        self.sphere.buildFromCube()
+        self.led_cube = LEDCube(16)
+        self.led_cube.buildMesh()
 
         self.grid = Grid()
-        self.grid.build()
+        self.grid.buildMesh()
 
         self.wireframe = True
         self.cube_state = True
@@ -61,18 +61,18 @@ class Application():
             if (event.type == pg.KEYDOWN and event.key == pg.K_c):
                 self.cube_state = not self.cube_state 
                 if self.cube_state:
-                    self.sphere.makeCube()
+                    self.led_cube.makeCube()
                 else:
-                    self.sphere.makeSphere()          
+                    self.led_cube.makeSphere()          
             if event.type == pg.WINDOWRESIZED:
                 GL.glViewport(0, 0, event.dict['x'], event.dict['y'])
             self.camera.handleEvent(event)
 
     def update(self, dt):
-        #self.sphere.rotateAngleAxis(dt * 0.1, glm.vec3(0.0, 1.0, 0.0))
-        #self.sphere.rotateAngleAxis(dt * 0.1, glm.vec3(1.0, 0.0, 0.0))
+        self.led_cube.rotateAngleAxis(dt * 0.1, glm.vec3(0.0, 1.0, 0.0))
+        self.led_cube.rotateAngleAxis(dt * 0.1, glm.vec3(1.0, 0.0, 0.0))
 
-        self.sphere.update()
+        self.led_cube.update()
 
         self.camera.update(dt)
 
@@ -80,7 +80,7 @@ class Application():
         GL.glClearColor(0.2, 0.2, 0.2, 0)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
-        MeshView(self.sphere, self.shader, self.camera).render(True, self.wireframe)
+        MeshView(self.led_cube, self.shader, self.camera).render(True, self.wireframe)
         MeshView(self.grid, self.shader, self.camera).render(True, False, True)
 
     def run(self):
