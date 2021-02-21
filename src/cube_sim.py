@@ -38,14 +38,15 @@ class Application():
 
         display_size = (1280, 720)
         pg.display.set_mode(display_size, pg.OPENGL | pg.DOUBLEBUF | pg.RESIZABLE)
-
+        pg.display.set_caption('led cube simulator')
+        
         self.rotation = Transform()
         self.camera = Camera()
         self.camera.setPosition(glm.vec3(-3.0, 0.0, 0.0))
 
         self.shader = Shader('shaders/model.vert', 'shaders/model.frag')
 
-        self.sphere = Sphere(1.0, 32)
+        self.sphere = Sphere(1.0, 16)
         self.sphere.buildFromCube()
 
         self.grid = Grid()
@@ -78,6 +79,8 @@ class Application():
     def update(self, dt):
         self.sphere.rotateAngleAxis(dt * 0.1, glm.vec3(0.0, 1.0, 0.0))
         self.sphere.rotateAngleAxis(dt * 0.1, glm.vec3(1.0, 0.0, 0.0))
+
+        self.sphere.update()
 
         self.camera.update(dt)
 

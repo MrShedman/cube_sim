@@ -2,7 +2,7 @@
 
 layout (location = 0) in vec3 vertex_position;
 layout (location = 1) in vec3 vertex_normal;
-layout (location = 2) in vec4 vertex_colour;
+layout (location = 2) in vec3 vertex_colour;
 
 uniform mat4   model;
 uniform mat4   view;
@@ -10,7 +10,7 @@ uniform mat4   projection;
 
 out vec3 frag_normal;
 out vec3 frag_pos;
-out vec4 frag_colour;
+out vec3 frag_colour;
 
 void main()
 {
