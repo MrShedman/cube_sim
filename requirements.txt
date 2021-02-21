@@ -1,4 +1,4 @@
-pygame==2.0.1
-numpy==1.19.1
-PyGLM==1.99.3
-PyOpenGL==3.1.5
+pygame
+numpy
+PyGLM
+PyOpenGL
