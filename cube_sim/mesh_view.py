@@ -33,11 +33,11 @@ class MeshView():
             self.shader.setUniformMatrix4f("model", self.renderable.getTransform())
             self.renderable.mesh.draw()
         
-        if wireframe:
+        if wireframe and hasattr(self.renderable, "mesh_outline"):
             GL.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_LINE)
             self.shader.setUniform1f("wireframe", 0.0)
             old_scale = self.renderable.getScale()
             self.renderable.setScale(old_scale * 1.001)
             self.shader.setUniformMatrix4f("model", self.renderable.getTransform())
             self.renderable.setScale(old_scale)
-            self.renderable.mesh.draw()
+            self.renderable.mesh_outline.draw()

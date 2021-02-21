@@ -59,14 +59,14 @@ class Mesh():
     def updatePositions(self):
         if len(self.positions) == self.vcount:
             self.vbo_position.sub_data(self.positions.nbytes, self.positions)
-
+    
     def updateNormals(self):
         if len(self.normals) == self.vcount:
             self.vbo_normal.sub_data(self.normals.nbytes, self.normals)
 
     def updateColours(self):
-        #if len(self.colours) == self.vcount:
-        self.vbo_colour.sub_data(self.colours.nbytes, self.colours)
+        if len(self.colours) == self.vcount:
+            self.vbo_colour.sub_data(self.colours.nbytes, self.colours)
 
     def draw(self):
         GL.glBindVertexArray(self.vao)
