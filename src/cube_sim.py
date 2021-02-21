@@ -60,8 +60,8 @@ class Application():
             self.camera.handleEvent(event)
 
     def update(self, dt):
-        self.sphere.rotateAngleAxis(dt * 0.1, glm.vec3(0.0, 1.0, 0.0))
-        self.sphere.rotateAngleAxis(dt * 0.1, glm.vec3(1.0, 0.0, 0.0))
+        #self.sphere.rotateAngleAxis(dt * 0.1, glm.vec3(0.0, 1.0, 0.0))
+        #self.sphere.rotateAngleAxis(dt * 0.1, glm.vec3(1.0, 0.0, 0.0))
 
         self.sphere.update()
 
@@ -117,5 +117,5 @@ if __name__ == "__main__":
     app = Application()
     app.run()
     del app
-    
+
     pg.quit()

@@ -2,9 +2,18 @@
 
 import glm
 import numpy as np
+from enum import IntEnum
 
 from transform import Transform
 from mesh import Mesh
+
+class Face(IntEnum):
+    TOP = 0
+    BOTTOM = 1
+    FRONT = 2
+    BACK = 3
+    LEFT = 4
+    RIGHT = 5
 
 class Sphere(Transform):
     def __init__(self, radius, subdivision):
@@ -18,9 +27,18 @@ class Sphere(Transform):
         self.mesh.addVertex(x, y, z, normal[0], normal[1], normal[2], normal[0], normal[1], normal[2])
 
     def update(self):
-        pass
-        #self.mesh.colours = np.random.uniform(0,1,(len(self.mesh.colours), 3)).astype(np.float32)
-        #self.mesh.updateColours()
+        length = int(len(self.mesh.colours)/6)
+        cols = np.random.uniform(0,1,(length, 3)).astype(np.float32)
+        self.updateFace(Face.LEFT, cols)
+        self.updateFace(Face.RIGHT, cols)
+        self.updateFace(Face.BOTTOM, cols)
+        self.mesh.updateColours()
+
+    def updateFace(self, face, colours):
+        length = int(len(self.mesh.colours)/6)
+        start = int(length*int(face.value))
+        end = int(length*(int(face.value)+1))
+        self.mesh.colours[start:end] = colours
 
     def buildFromCube(self):
         self.mesh = Mesh(6 * 6 * self.subdivision * self.subdivision)
@@ -28,22 +46,6 @@ class Sphere(Transform):
         segments, step = np.linspace(-1, 1, self.subdivision, False, True)
 
         # Z TOP
-        normal = np.array([0.0, 0.0, 1.0])
-        for i in segments:
-            for j in segments:
-                top = i
-                bottom = i + step
-                left = j
-                right = j + step
-                self.addVertex(left, top, -1.0, normal)
-                self.addVertex(right, bottom, -1.0, normal)
-                self.addVertex(right, top, -1.0, normal)
-
-                self.addVertex(left, top, -1.0, normal)
-                self.addVertex(left, bottom, -1.0, normal)
-                self.addVertex(right, bottom, -1.0, normal)
-
-        # Z BOTTOM
         normal = np.array([0.0, 0.0, -1.0])
         for i in segments:
             for j in segments:
@@ -59,6 +61,22 @@ class Sphere(Transform):
                 self.addVertex(left, top, 1.0, normal)
                 self.addVertex(left, bottom, 1.0, normal)
                 self.addVertex(right, bottom, 1.0, normal)
+
+        # Z BOTTOM
+        normal = np.array([0.0, 0.0, 1.0])
+        for i in segments:
+            for j in segments:
+                top = i
+                bottom = i + step
+                left = j
+                right = j + step
+                self.addVertex(left, top, -1.0, normal)
+                self.addVertex(right, bottom, -1.0, normal)
+                self.addVertex(right, top, -1.0, normal)
+
+                self.addVertex(left, top, -1.0, normal)
+                self.addVertex(left, bottom, -1.0, normal)
+                self.addVertex(right, bottom, -1.0, normal)
     
         # X FRONT
         normal = np.array([1.0, 0.0, 0.0])
