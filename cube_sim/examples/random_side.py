@@ -1,35 +1,26 @@
 #!/usr/bin/env python
 
-import math
-import time
-import ctypes
-import signal
-
-import pygame as pg
-import OpenGL.GL as GL
-import OpenGL.GLU as GLU
-import numpy as np
-import glm
-
+from cube_sim.application import Application
 from cube_sim.transform import Transform
 from cube_sim.shader import Shader
 from cube_sim.camera import Camera
 from cube_sim.mesh import Mesh
 from cube_sim.mesh_view import MeshView
-from cube_sim.led_cube import LEDCube
+from cube_sim.led_cube import LEDCube, Face
 from cube_sim.grid import Grid
 
-class Application():
+import pygame as pg
+import numpy as np
+import glm
+
+class RandomSide(Application):
     def __init__(self):
-        self.is_open = True
-        self.timePerFrame = 1.0 / 60.0
-        signal.signal(signal.SIGINT, self.close)
-                
-        self.rotation = Transform()
+        super().__init__(1280, 720, 60)
+   
         self.camera = Camera()
         self.camera.setPosition(glm.vec3(-3.0, 0.0, 0.0))
 
-        self.shader = Shader('shaders/model.vert', 'shaders/model.frag')
+        self.shader = Shader(self.getResource('model.vert'), self.getResource('model.frag'))
 
         self.led_cube = LEDCube(64)
         self.led_cube.buildMesh()
@@ -41,91 +32,32 @@ class Application():
         self.wireframe = False
         self.cube_state = True
 
-        GL.glEnable(GL.GL_DEPTH_TEST)
-        GL.glEnable(GL.GL_STENCIL_TEST)
-        GL.glDepthFunc(GL.GL_LEQUAL) # for wireframe rendering
-        GL.glEnable(GL.GL_BLEND)
-        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
-        GL.glEnable(GL.GL_MULTISAMPLE)
-        GL.glEnable(GL.GL_LINE_SMOOTH)
-        GL.glLineWidth(1.0)
-
-    def getInput(self):
-        events = pg.event.get()
-        for event in events:
-            if event.type == pg.QUIT:
-                self.close()
-            if (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
-                self.close()
-            if (event.type == pg.KEYDOWN and event.key == pg.K_m):
-                self.wireframe = not self.wireframe  
-            if (event.type == pg.KEYDOWN and event.key == pg.K_c):
-                self.cube_state = not self.cube_state 
-                if self.cube_state:
-                    self.led_cube.makeCube()
-                else:
-                    self.led_cube.makeSphere()          
-            if event.type == pg.WINDOWRESIZED:
-                GL.glViewport(0, 0, event.dict['x'], event.dict['y'])
-            self.camera.handleEvent(event)
+    def handleEvent(self, event):
+        if (event.type == pg.KEYDOWN and event.key == pg.K_m):
+            self.wireframe = not self.wireframe  
+        if (event.type == pg.KEYDOWN and event.key == pg.K_c):
+            self.cube_state = not self.cube_state 
+            if self.cube_state:
+                self.led_cube.makeCube()
+            else:
+                self.led_cube.makeSphere()          
+        self.camera.handleEvent(event)
 
     def update(self, dt):
-        #self.led_cube.rotateAngleAxis(dt * 0.1, glm.vec3(0.0, 1.0, 0.0))
-        #self.led_cube.rotateAngleAxis(dt * 0.1, glm.vec3(1.0, 0.0, 0.0))
-
+        dims = (self.led_cube.subdivision * self.led_cube.subdivision, 3)
+        colours = np.random.uniform(0, 1, dims).astype(np.float32)
+        self.led_cube.updateFace(Face.LEFT, colours)
+        self.led_cube.updateFace(Face.RIGHT, colours)
+        self.led_cube.updateFace(Face.BOTTOM, colours)
         self.led_cube.update()
 
         self.camera.update(dt)
 
     def render(self):
-        GL.glClearColor(0.2, 0.2, 0.2, 0)
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-
         MeshView(self.led_cube, self.shader, self.camera).render(True, self.wireframe)
         MeshView(self.grid, self.shader, self.camera).render(True, False, True)
 
-    def run(self):
-        timeSinceLastUpdate = 0.0
-        lastTime = time.time()
-  
-        # Start loop
-        while self.is_open:
-            dt = time.time() - lastTime
-            lastTime = time.time()
-            timeSinceLastUpdate += dt
-
-            while timeSinceLastUpdate > self.timePerFrame:
-                timeSinceLastUpdate -= self.timePerFrame
-                self.getInput()
-                self.update(self.timePerFrame)
-
-            self.render()
-            pg.display.flip()
-
-    def close(self, signum = 0, frame = 0):
-        self.is_open = False
-
 if __name__ == "__main__":
-
-    pg.init()
-
-    gl_version = (3, 2)
-
-    pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, gl_version[0])
-    pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, gl_version[1])
-    pg.display.gl_set_attribute(pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE)
-    pg.display.gl_set_attribute(pg.GL_MULTISAMPLEBUFFERS, 1)
-    pg.display.gl_set_attribute(pg.GL_MULTISAMPLESAMPLES, 4)
-    pg.display.gl_set_attribute(pg.GL_DOUBLEBUFFER, 1)
-    pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)
-    pg.display.gl_set_attribute(pg.GL_STENCIL_SIZE, 8)
-
-    display_size = (1280, 720)
-    pg.display.set_mode(display_size, pg.OPENGL | pg.DOUBLEBUF | pg.RESIZABLE)
-    pg.display.set_caption('led cube simulator')
-
-    app = Application()
+    app = RandomSide()
     app.run()
     del app
-
-    pg.quit()

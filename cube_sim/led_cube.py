@@ -26,11 +26,6 @@ class LEDCube(Transform):
         self.outline_count = 0
 
     def update(self):
-        length = self.subdivision * self.subdivision
-        cols = np.random.uniform(0,1,(length, 3)).astype(np.float32)
-        self.updateFace(Face.LEFT, cols)
-        self.updateFace(Face.RIGHT, cols)
-        self.updateFace(Face.BOTTOM, cols)
         self.mesh.updateColours()
 
     def updateFace(self, face, colours):
