@@ -5,7 +5,6 @@ from math import sin, cos, radians, pi
 from time import time
 import pygame as pg
 import OpenGL.GL as GL
-import OpenGL.GLU as GLU
 import glm
 
 class Filter():

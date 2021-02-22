@@ -18,7 +18,7 @@ class RandomSide(Application):
         super().__init__(1280, 720, 60)
    
         self.camera = Camera()
-        self.camera.setPosition(glm.vec3(-3.0, 0.0, 0.0))
+        self.camera.setPosition(glm.vec3(-5.0, 0.0, 0.0))
 
         self.shader = Shader('model.vert', 'model.frag')
 
@@ -29,7 +29,7 @@ class RandomSide(Application):
         self.grid = Grid()
         self.grid.buildMesh()
 
-        self.wireframe = False
+        self.wireframe = True
         self.cube_state = True
 
     def handleEvent(self, event):

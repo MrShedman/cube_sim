@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import OpenGL.GL as GL
-import OpenGL.GLU as GLU
 import glm
 from cube_sim.mesh import Mesh
 from cube_sim.shader import Shader

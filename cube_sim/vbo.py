@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import OpenGL.GL as GL
-import OpenGL.GLU as GLU
 
 class VBO:
     def __init__(self, target, usage):

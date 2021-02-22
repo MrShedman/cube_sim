@@ -9,7 +9,6 @@ import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame as pg
 import OpenGL.GL as GL
-import OpenGL.GLU as GLU
 import numpy as np
 import glm
 from cube_sim.resource import getResource

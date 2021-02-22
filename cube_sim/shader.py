@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import OpenGL.GL as GL
-import OpenGL.GLU as GLU
 import numpy as np
 import glm
 

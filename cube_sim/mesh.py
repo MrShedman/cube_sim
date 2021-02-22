@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import OpenGL.GL as GL
-import OpenGL.GLU as GLU
 import glm
 from cube_sim.vbo import VBO
 import numpy as np
