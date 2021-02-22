@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import glm
+import time
 import numpy as np
 import OpenGL.GL as GL
 
@@ -9,6 +10,7 @@ from math import sqrt
 
 from cube_sim.transform import Transform
 from cube_sim.mesh import Mesh
+from cube_sim.resource import getResource
 
 class Face(IntEnum):
     TOP = 0
@@ -24,6 +26,9 @@ class LEDCube(Transform):
         self.subdivision = subdivision
         self.fill_count = 0
         self.outline_count = 0
+        self.mesh = Mesh(6 * 6 * self.subdivision * self.subdivision)
+        self.mesh_outline = Mesh(self.subdivision * (self.subdivision + 1) * 4 * 6)
+        self.mesh_outline.mode = GL.GL_LINES
 
     def update(self):
         self.mesh.updateColours()
@@ -55,11 +60,50 @@ class LEDCube(Transform):
         self.mesh_outline.updateNormals()
 
     def buildMesh(self):
+        filename = 'mesh' + str(self.subdivision) + 'x' + str(self.subdivision) + 'f.npz'
+        path = getResource(filename)
+        try:
+            npzfile = np.load(path)
+        except IOError:
+            self.generateMesh()
+            np.savez(path, positions=self.mesh.positions, normals=self.mesh.normals, colours=self.mesh.colours, indices=self.mesh.indices)
+        else:
+            self.mesh.positions = npzfile['positions']
+            self.mesh.normals = npzfile['normals']
+            self.mesh.colours = npzfile['colours']
+            self.mesh.indices = npzfile['indices']
+
+        self.cube_positions = self.mesh.positions
+        self.cube_normals = self.mesh.normals
+        self.sphere_positions = self.mesh.positions / np.linalg.norm(self.mesh.positions, axis=1, keepdims=True) * sqrt(3.0)
+        self.sphere_normals = self.mesh.positions
+
+        self.mesh.complete()
+
+    def buildMeshOutline(self):
+        filename = 'mesh' + str(self.subdivision) + 'x' + str(self.subdivision) + 'o.npz'
+        path = getResource(filename)
+        try:
+            npzfile = np.load(path)
+        except IOError: 
+            self.generateMeshOutline()
+            np.savez(path, positions=self.mesh_outline.positions, normals=self.mesh_outline.normals, colours=self.mesh_outline.colours, indices=self.mesh_outline.indices)
+        else:
+            self.mesh_outline.positions = npzfile['positions']
+            self.mesh_outline.normals = npzfile['normals']
+            self.mesh_outline.colours = npzfile['colours']
+            self.mesh_outline.indices = npzfile['indices']
+        self.cube_outline_positions = self.mesh_outline.positions
+        self.cube_outline_normals = self.mesh_outline.normals
+        self.sphere_outline_positions = self.mesh_outline.positions / np.linalg.norm(self.mesh_outline.positions, axis=1, keepdims=True) * sqrt(3.0)
+        self.sphere_outline_normals = self.mesh_outline.positions
+
+        self.mesh_outline.complete()
+
+    def generateMesh(self):
         def addVertex(x, y, z, normal):
             self.mesh.addVertex(x, y, z, normal[0], normal[1], normal[2], normal[0], normal[1], normal[2])
             self.fill_count += 1
-
-        self.mesh = Mesh(6 * 6 * self.subdivision * self.subdivision)
 
         segments, step = np.linspace(-1, 1, self.subdivision, False, True)
 
@@ -165,17 +209,9 @@ class LEDCube(Transform):
                 addVertex(right, -1.0, bottom, normal)
 
         self.mesh.indices = np.linspace(0, len(self.mesh.indices), len(self.mesh.indices), False, dtype=np.uint32)
-
         self.mesh.colours = np.absolute(self.mesh.colours)
 
-        self.cube_positions = self.mesh.positions
-        self.cube_normals = self.mesh.normals
-        self.sphere_positions = self.mesh.positions / np.linalg.norm(self.mesh.positions, axis=1, keepdims=True) * sqrt(3.0)
-        self.sphere_normals = self.mesh.positions
-
-        self.mesh.complete()
-
-    def buildMeshOutline(self):
+    def generateMeshOutline(self):
         def addVertex(x, y, z, normal):
             self.mesh_outline.addVertex(x, y, z, normal[0], normal[1], normal[2], 0.0, 0.0, 0.0)
             self.outline_count += 1
@@ -183,87 +219,44 @@ class LEDCube(Transform):
         extent = 1
         interval = 2 / (self.subdivision + 1)
         segments = np.linspace(-extent, extent, int((extent+1) / interval), True)
-        fc = extent
-        self.mesh_outline = Mesh(len(segments) * (len(segments)-1) * 4 * 6)
-        self.mesh_outline.mode = GL.GL_LINES
 
-        # Z TOP
+        # Z TOP and BOTTOM
         normal = np.array([0.0, 0.0, 1.0])
         for c in segments:
             for n1, n2 in zip(segments, segments[1:]):
-                addVertex(n1, c, fc, normal)
-                addVertex(n2, c, fc, normal)
+                addVertex(n1, c, extent, normal)
+                addVertex(n2, c, extent, normal)
+                addVertex(c, n1, extent, normal)
+                addVertex(c, n2, extent, normal)
+                addVertex(n1, c, -extent, -normal)
+                addVertex(n2, c, -extent, -normal)
+                addVertex(c, n1, -extent, -normal)
+                addVertex(c, n2, -extent, -normal)
 
-        for c in segments:
-            for n1, n2 in zip(segments, segments[1:]):
-                addVertex(c, n1, fc, normal)
-                addVertex(c, n2, fc, normal)
-
-        # Z BOTTOM
-        normal = np.array([0.0, 0.0, -1.0])
-        for c in segments:
-            for n1, n2 in zip(segments, segments[1:]):
-                addVertex(n1, c, -fc, normal)
-                addVertex(n2, c, -fc, normal)
-
-        for c in segments:
-            for n1, n2 in zip(segments, segments[1:]):
-                addVertex(c, n1, -fc, normal)
-                addVertex(c, n2, -fc, normal)
-
-        # X FRONT
+        # X FRONT and BACK
         normal = np.array([1.0, 0.0, 0.0])
         for c in segments:
             for n1, n2 in zip(segments, segments[1:]):
-                addVertex(fc, n1, c, normal)
-                addVertex(fc, n2, c, normal)
+                addVertex(extent, n1, c, normal)
+                addVertex(extent, n2, c, normal)
+                addVertex(extent, c, n1, normal)
+                addVertex(extent, c, n2, normal)
+                addVertex(-extent, n1, c, -normal)
+                addVertex(-extent, n2, c, -normal)
+                addVertex(-extent, c, n1, -normal)
+                addVertex(-extent, c, n2, -normal)
 
-        for c in segments:
-            for n1, n2 in zip(segments, segments[1:]):
-                addVertex(fc, c, n1, normal)
-                addVertex(fc, c, n2, normal)
-
-        # X BACK
-        normal = np.array([-1.0, 0.0, 0.0])
-        for c in segments:
-            for n1, n2 in zip(segments, segments[1:]):
-                addVertex(-fc, n1, c, normal)
-                addVertex(-fc, n2, c, normal)
-
-        for c in segments:
-            for n1, n2 in zip(segments, segments[1:]):
-                addVertex(-fc, c, n1, normal)
-                addVertex(-fc, c, n2, normal)
-
-        # Y LEFT
+        # Y LEFT and RIGHT
         normal = np.array([0.0, 1.0, 0.0])
         for c in segments:
             for n1, n2 in zip(segments, segments[1:]):
-                addVertex(n1, fc, c, normal)
-                addVertex(n2, fc, c, normal)
-
-        for c in segments:
-            for n1, n2 in zip(segments, segments[1:]):
-                addVertex(c, fc, n1, normal)
-                addVertex(c, fc, n2, normal)
-
-        # Y RIGHT
-        normal = np.array([0.0, -1.0, 0.0])
-        for c in segments:
-            for n1, n2 in zip(segments, segments[1:]):
-                addVertex(n1, -fc, c, normal)
-                addVertex(n2, -fc, c, normal)
-
-        for c in segments:
-            for n1, n2 in zip(segments, segments[1:]):
-                addVertex(c, -fc, n1, normal)
-                addVertex(c, -fc, n2, normal)
+                addVertex(n1, extent, c, normal)
+                addVertex(n2, extent, c, normal)
+                addVertex(c, extent, n1, normal)
+                addVertex(c, extent, n2, normal)
+                addVertex(n1, -extent, c, -normal)
+                addVertex(n2, -extent, c, -normal)
+                addVertex(c, -extent, n1, -normal)
+                addVertex(c, -extent, n2, -normal)
 
         self.mesh_outline.indices = np.linspace(0, len(self.mesh_outline.indices), len(self.mesh_outline.indices), False, dtype=np.uint32)
-
-        self.cube_outline_positions = self.mesh_outline.positions
-        self.cube_outline_normals = self.mesh_outline.normals
-        self.sphere_outline_positions = self.mesh_outline.positions / np.linalg.norm(self.mesh_outline.positions, axis=1, keepdims=True) * sqrt(3.0)
-        self.sphere_outline_normals = self.mesh_outline.positions
-
-        self.mesh_outline.complete()

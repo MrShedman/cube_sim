@@ -20,7 +20,7 @@ class RandomSide(Application):
         self.camera = Camera()
         self.camera.setPosition(glm.vec3(-3.0, 0.0, 0.0))
 
-        self.shader = Shader(self.getResource('model.vert'), self.getResource('model.frag'))
+        self.shader = Shader('model.vert', 'model.frag')
 
         self.led_cube = LEDCube(64)
         self.led_cube.buildMesh()

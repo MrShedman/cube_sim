@@ -5,9 +5,11 @@ import OpenGL.GLU as GLU
 import numpy as np
 import glm
 
+from cube_sim.resource import getResource
+
 class Shader():
     def __init__(self, vertexFilename, fragmentFilename):
-        self.load(vertexFilename, fragmentFilename)
+        self.load(getResource(vertexFilename), getResource(fragmentFilename))
         self.uniforms = dict()
 
     def __del__(self):

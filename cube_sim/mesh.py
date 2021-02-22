@@ -2,10 +2,8 @@
 
 import OpenGL.GL as GL
 import OpenGL.GLU as GLU
-import ctypes
 import glm
 from cube_sim.vbo import VBO
-from OpenGL.arrays import vbo
 import numpy as np
 
 class Mesh():
@@ -15,9 +13,9 @@ class Mesh():
         self.icount = 0
 
         self.positions = np.zeros(size, dtype=(np.float32, 3))
-        self.normals = np.zeros(size, dtype=(np.float32, 3))
-        self.colours = np.zeros(size, dtype=(np.float32, 3))
-        self.indices = np.zeros(size, dtype=np.uint32)
+        self.normals =   np.zeros(size, dtype=(np.float32, 3))
+        self.colours =   np.zeros(size, dtype=(np.float32, 3))
+        self.indices =   np.zeros(size, dtype=np.uint32)
 
     def __del__(self):
         GL.glDeleteVertexArrays(1, [self.vao])
@@ -57,16 +55,13 @@ class Mesh():
         GL.glBindVertexArray(0)
 
     def updatePositions(self):
-        if len(self.positions) == self.vcount:
-            self.vbo_position.sub_data(self.positions.nbytes, self.positions)
+        self.vbo_position.sub_data(self.positions.nbytes, self.positions)
     
     def updateNormals(self):
-        if len(self.normals) == self.vcount:
-            self.vbo_normal.sub_data(self.normals.nbytes, self.normals)
+        self.vbo_normal.sub_data(self.normals.nbytes, self.normals)
 
     def updateColours(self):
-        if len(self.colours) == self.vcount:
-            self.vbo_colour.sub_data(self.colours.nbytes, self.colours)
+        self.vbo_colour.sub_data(self.colours.nbytes, self.colours)
 
     def draw(self):
         GL.glBindVertexArray(self.vao)

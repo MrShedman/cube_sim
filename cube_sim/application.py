@@ -12,7 +12,7 @@ import OpenGL.GL as GL
 import OpenGL.GLU as GLU
 import numpy as np
 import glm
-from pathlib import Path
+from cube_sim.resource import getResource
 
 class Application():
     def __init__(self, w = 1280, h = 720, hz = 60):
@@ -30,7 +30,7 @@ class Application():
         display_size = (w, h)
         pg.display.set_mode(display_size, pg.OPENGL | pg.DOUBLEBUF | pg.RESIZABLE)
         pg.display.set_caption('led cube simulator')
-        programIcon = pg.image.load(self.getResource('icon.png'))
+        programIcon = pg.image.load(getResource('icon.png'))
         pg.display.set_icon(programIcon)
 
         GL.glEnable(GL.GL_DEPTH_TEST)
@@ -48,11 +48,6 @@ class Application():
 
     def __del__(self):
         pg.quit()
-
-    def getResource(self, resource):
-        here = Path(__file__).parent.parent
-        fname = here/'res'/resource
-        return str(fname)
 
     def getInput(self):
         events = pg.event.get()
