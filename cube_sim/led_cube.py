@@ -26,7 +26,7 @@ class LEDCube(Transform):
         self.subdivision = subdivision
         self.fill_count = 0
         self.outline_count = 0
-        self.mesh = Mesh(6 * 6 * self.subdivision * self.subdivision)
+        self.mesh =         Mesh(self.subdivision * self.subdivision * 6 * 6)
         self.mesh_outline = Mesh(self.subdivision * (self.subdivision + 1) * 4 * 6)
         self.mesh_outline.mode = GL.GL_LINES
 

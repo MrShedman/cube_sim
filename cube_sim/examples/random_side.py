@@ -12,13 +12,15 @@ from cube_sim.grid import Grid
 import pygame as pg
 import numpy as np
 import glm
+import math
 
 class RandomSide(Application):
     def __init__(self):
         super().__init__(1280, 720, 60)
    
         self.camera = Camera()
-        self.camera.setPosition(glm.vec3(-5.0, 0.0, 0.0))
+        self.camera.setPosition(glm.vec3(-5.0, 0.0, 2.0))
+        self.camera.setPitch(math.radians(-20))
 
         self.shader = Shader('model.vert', 'model.frag')
 

@@ -60,6 +60,12 @@ class Camera():
     def setPosition(self, pos):
         self.position = pos
 
+    def setPitch(self, pitch):
+        self.pitch = pitch
+
+    def setYaw(self, yaw):
+        self.yaw = yaw
+
     def updateProjectionMatrix(self):
        self.projection = glm.perspective(self.fov, self.aspect, self.nearPlaneDistance, self.farPlaceDistance)
 
