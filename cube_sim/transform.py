@@ -87,6 +87,6 @@ class Transform():
     
     def getInverseTransform(self):
         if self.inv_transform_dirty:
-            self.inv_transform = glm.inverse(self.transform)
+            self.inv_transform = glm.inverse(self.getTransform())
             self.inv_transform_dirty = False
         return self.inv_transform
