@@ -21,7 +21,7 @@ class MeshView():
 
         if fade:
             self.shader.setUniform1f("fade", 1.0)
-            self.shader.setUniform3f("lightPos", glm.vec3(0.5, 0.5, 20.0))
+            self.shader.setUniform3f("lightPos", glm.vec3(0.0, 0.0, 20.0))
         else:
             self.shader.setUniform1f("fade", 0.0)
             self.shader.setUniform3f("lightPos", self.camera.getPosition())
@@ -36,7 +36,7 @@ class MeshView():
             GL.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_LINE)
             self.shader.setUniform1f("wireframe", 0.0)
             old_scale = self.renderable.getScale()
-            self.renderable.setScale(old_scale * 1.001)
+            self.renderable.setScale(old_scale * 1.0001)
             self.shader.setUniformMatrix4f("model", self.renderable.getTransform())
             self.renderable.setScale(old_scale)
             self.renderable.mesh_outline.draw()

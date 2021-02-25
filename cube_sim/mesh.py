@@ -35,18 +35,15 @@ class Mesh():
         
         self.vbo_position = VBO(GL.GL_ARRAY_BUFFER, GL.GL_DYNAMIC_DRAW)
         self.vbo_position.data(self.positions.nbytes, self.positions)
-        GL.glEnableVertexAttribArray(0)
-        GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, False, 12, None)
+        self.vbo_position.set_slot(0, 3)
         
         self.vbo_normal = VBO(GL.GL_ARRAY_BUFFER, GL.GL_DYNAMIC_DRAW)
         self.vbo_normal.data(self.normals.nbytes, self.normals)
-        GL.glEnableVertexAttribArray(1)
-        GL.glVertexAttribPointer(1, 3, GL.GL_FLOAT, False, 12, None)
+        self.vbo_normal.set_slot(1, 3)
         
         self.vbo_colour = VBO(GL.GL_ARRAY_BUFFER, GL.GL_DYNAMIC_DRAW)
         self.vbo_colour.data(self.colours.nbytes, self.colours)
-        GL.glEnableVertexAttribArray(2)
-        GL.glVertexAttribPointer(2, 3, GL.GL_FLOAT, False, 12, None)
+        self.vbo_colour.set_slot(2, 3)
 
         self.ibo = VBO(GL.GL_ELEMENT_ARRAY_BUFFER, GL.GL_STATIC_DRAW)
         self.ibo.data(self.indices.nbytes, self.indices)
