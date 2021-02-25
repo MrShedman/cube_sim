@@ -57,7 +57,6 @@ class Shader():
 
         GL.glDetachShader(self.program, vertex)
         GL.glDetachShader(self.program, fragment)
-        self.bind()
 
     def cacheUniform(self, uniform):
         if uniform not in self.uniforms:

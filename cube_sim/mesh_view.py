@@ -13,6 +13,7 @@ class MeshView():
         self.camera = camera
 
     def render(self, solid=True, wireframe=False, fade=False):
+        self.shader.bind()
         self.shader.setUniformMatrix4f("view", self.camera.getViewMatrix())
         self.shader.setUniformMatrix4f("projection", self.camera.getProjectionMatrix())
 
