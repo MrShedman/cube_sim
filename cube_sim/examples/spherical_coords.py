@@ -13,8 +13,28 @@ import pygame as pg
 import numpy as np
 import glm
 import math
+import random
 
-class RandomSide(Application):
+MAX_SPEED = 0.001
+
+class Particle():
+    def __init__(self):
+        self.pos = glm.vec2(math.pi, math.pi)
+        self.vel = glm.vec2(random.uniform(-MAX_SPEED, MAX_SPEED), random.uniform(-MAX_SPEED, MAX_SPEED))
+        self.col = glm.vec3(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
+        self.age = 0.0
+
+    def update(self, dt):
+        self.pos += self.vel / dt
+        self.pos = glm.mod(self.pos, 2.0 * math.pi)
+        # self.vel += 
+        self.age += dt
+
+    def getIndexInRange(self, range):
+        id_vec = glm.floor(self.pos / (2.0 * math.pi) * range)
+        return int(id_vec.x + id_vec.y * range)
+
+class SphericalCoords(Application):
     def __init__(self):
         super().__init__(1280, 720, 60)
    
@@ -32,6 +52,10 @@ class RandomSide(Application):
         self.grid = Grid()
         self.grid.buildMesh()
 
+        self.particles = []
+        for i in range(100):
+            self.particles.append(Particle())
+
         self.wireframe = True
         self.cube_state = True
 
@@ -48,10 +72,13 @@ class RandomSide(Application):
 
     def update(self, dt):
         dims = (self.led_cube.subdivision * self.led_cube.subdivision, 3)
-        colours = np.random.uniform(0, 1, dims).astype(np.float32)
-        self.led_cube.updateFace(Face.LEFT, colours)
-        self.led_cube.updateFace(Face.RIGHT, colours)
-        self.led_cube.updateFace(Face.BOTTOM, colours)
+        colours = np.zeros(dims).astype(np.float32)
+
+        for p in self.particles:
+            p.update(dt)
+            colours[p.getIndexInRange(64)] = np.array(p.col)
+
+        self.led_cube.updateFace(Face.BACK, colours)
         self.led_cube.update()
 
         self.camera.update(dt)
@@ -61,6 +88,6 @@ class RandomSide(Application):
         MeshView(self.grid, self.shader, self.camera).render(True, False, True)
 
 if __name__ == "__main__":
-    app = RandomSide()
+    app = SphericalCoords()
     app.run()
     del app
