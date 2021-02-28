@@ -13,12 +13,12 @@ from cube_sim.mesh import Mesh
 from cube_sim.resource import getResource
 
 class Face(IntEnum):
-    TOP = 0
-    BOTTOM = 1
-    FRONT = 2
-    BACK = 3
-    LEFT = 4
-    RIGHT = 5
+    FRONT = 0
+    BACK = 1
+    LEFT = 2
+    RIGHT = 3
+    TOP = 4
+    BOTTOM = 5
 
 class LEDCube(Transform):
     def __init__(self, subdivision):
@@ -106,39 +106,6 @@ class LEDCube(Transform):
             self.fill_count += 1
 
         segments, step = np.linspace(-1, 1, self.subdivision, False, True)
-
-        # Z TOP
-        normal = np.array([0.0, 0.0, 1.0])
-        for i in segments:
-            for j in segments:
-                top = i
-                bottom = i + step
-                left = j
-                right = j + step
-
-                addVertex(left, top, 1.0, normal)
-                addVertex(right, bottom, 1.0, normal)
-                addVertex(right, top, 1.0, normal)
-
-                addVertex(left, top, 1.0, normal)
-                addVertex(left, bottom, 1.0, normal)
-                addVertex(right, bottom, 1.0, normal)
-
-        # Z BOTTOM
-        normal = np.array([0.0, 0.0, -1.0])
-        for i in segments:
-            for j in segments:
-                top = i
-                bottom = i + step
-                left = j
-                right = j + step
-                addVertex(left, top, -1.0, normal)
-                addVertex(right, bottom, -1.0, normal)
-                addVertex(right, top, -1.0, normal)
-
-                addVertex(left, top, -1.0, normal)
-                addVertex(left, bottom, -1.0, normal)
-                addVertex(right, bottom, -1.0, normal)
     
         # X FRONT
         normal = np.array([1.0, 0.0, 0.0])
@@ -207,6 +174,39 @@ class LEDCube(Transform):
                 addVertex(left, -1.0, top, normal)
                 addVertex(left, -1.0, bottom, normal)
                 addVertex(right, -1.0, bottom, normal)
+
+        # Z TOP
+        normal = np.array([0.0, 0.0, 1.0])
+        for i in segments:
+            for j in segments:
+                top = i
+                bottom = i + step
+                left = j
+                right = j + step
+
+                addVertex(left, top, 1.0, normal)
+                addVertex(right, bottom, 1.0, normal)
+                addVertex(right, top, 1.0, normal)
+
+                addVertex(left, top, 1.0, normal)
+                addVertex(left, bottom, 1.0, normal)
+                addVertex(right, bottom, 1.0, normal)
+
+        # Z BOTTOM
+        normal = np.array([0.0, 0.0, -1.0])
+        for i in segments:
+            for j in segments:
+                top = i
+                bottom = i + step
+                left = j
+                right = j + step
+                addVertex(left, top, -1.0, normal)
+                addVertex(right, bottom, -1.0, normal)
+                addVertex(right, top, -1.0, normal)
+
+                addVertex(left, top, -1.0, normal)
+                addVertex(left, bottom, -1.0, normal)
+                addVertex(right, bottom, -1.0, normal)
 
         self.mesh.indices = np.linspace(0, len(self.mesh.indices), len(self.mesh.indices), False, dtype=np.uint32)
         self.mesh.colours = np.absolute(self.mesh.colours)
