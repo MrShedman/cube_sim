@@ -34,12 +34,6 @@ class Transform():
         rot = glm.angleAxis(angle, glm.normalize(axis))
         self.setRotation(rot)
 
-    def setRotationAngleAxisPivot(self, angle, axis, pivot):
-        rot = glm.angleAxis(angle, glm.normalize(axis))
-        vec = self.position - self.origin - pivot
-        self.setPosition(pivot + vec * rot + self.origin)
-        self.setRotation(rot)
-
     def rotate(self, rotation):
         self.setRotation(glm.normalize(rotation * self.rotation))
 
@@ -47,11 +41,10 @@ class Transform():
         rot = glm.angleAxis(angle, glm.normalize(axis))
         self.setRotation(glm.normalize(rot) * self.rotation)
 
-    def rotateAngleAxisPivot(self, angle, axis, pivot):
+    def rotateAroundPoint(self, angle, axis, pivot):
         rot = glm.angleAxis(angle, glm.normalize(axis))
         vec = self.position - self.origin - pivot
         self.setPosition(pivot + vec * rot + self.origin)
-        self.setRotation(glm.normalize(rot) * self.rotation)
 
     def setScale(self, factor):
         self.scale = factor
