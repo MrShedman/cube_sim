@@ -97,7 +97,7 @@ def getIndexFromSphereCoords(theta, phi):
 
 class Particle():
     def __init__(self):
-        self.pos = glm.vec2(math.pi, math.pi)
+        self.pos = glm.vec2(0, 0)
         self.vel = glm.vec2(random.uniform(-MAX_SPEED, MAX_SPEED), random.uniform(-MAX_SPEED, MAX_SPEED))
         self.col = glm.vec3(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
         self.age = 0.0
@@ -172,13 +172,16 @@ class SphericalCoords(Application):
             if face_id == 5:
                 col_zmin[uv] = p.col
 
-        self.led_cube.updateFace(Face.BOTTOM,   col_zmin)
-        self.led_cube.updateFace(Face.TOP,      col_zmax)
-        self.led_cube.updateFace(Face.RIGHT,    col_ymin)
-        self.led_cube.updateFace(Face.LEFT,     col_ymax)
+        # y and z are flipped around because opengl
+        self.led_cube.updateFace(Face.BOTTOM,   col_ymin)
+        self.led_cube.updateFace(Face.TOP,      col_ymax)
+        self.led_cube.updateFace(Face.RIGHT,    col_zmin)
+        self.led_cube.updateFace(Face.LEFT,     col_zmax)
         self.led_cube.updateFace(Face.BACK,     col_xmin)
         self.led_cube.updateFace(Face.FRONT,    col_xmax)
         self.led_cube.update()
+
+        self.led_cube.rotateAngleAxis(dt * 0.1, glm.vec3(0, 0, 1))
 
         self.camera.update(dt)
 

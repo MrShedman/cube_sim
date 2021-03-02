@@ -110,7 +110,7 @@ class LEDCube(Transform):
         # X FRONT
         normal = np.array([1.0, 0.0, 0.0])
         for i in segments:
-            for j in segments:
+            for j in reversed(segments):
                 top = i
                 bottom = i + step
                 left = j
@@ -161,7 +161,7 @@ class LEDCube(Transform):
         # Y RIGHT
         normal = np.array([0.0, -1.0, 0.0])
         for i in segments:
-            for j in segments:
+            for j in reversed(segments):
                 top = i
                 bottom = i + step
                 left = j
@@ -177,7 +177,7 @@ class LEDCube(Transform):
 
         # Z TOP
         normal = np.array([0.0, 0.0, 1.0])
-        for i in segments:
+        for i in reversed(segments):
             for j in segments:
                 top = i
                 bottom = i + step
@@ -200,6 +200,7 @@ class LEDCube(Transform):
                 bottom = i + step
                 left = j
                 right = j + step
+
                 addVertex(left, top, -1.0, normal)
                 addVertex(right, bottom, -1.0, normal)
                 addVertex(right, top, -1.0, normal)
