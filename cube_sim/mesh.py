@@ -17,7 +17,10 @@ class Mesh():
         self.indices =   np.zeros(size, dtype=np.uint32)
 
     def __del__(self):
-        GL.glDeleteVertexArrays(1, [self.vao])
+        try:
+            GL.glDeleteVertexArrays(1, [self.vao])
+        except:
+            pass
         
     def addVertex(self, x, y, z, nx, ny, nz, r, g, b):
         self.positions[self.vcount] = np.array([x, y, z])

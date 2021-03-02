@@ -12,8 +12,11 @@ class Shader():
         self.uniforms = dict()
 
     def __del__(self):
-        GL.glDeleteProgram(self.program)
-
+        try:
+            GL.glDeleteProgram(self.program)
+        except:
+            pass
+        
     def name(self):
         return self.program
     
