@@ -8,6 +8,7 @@ from cube_sim.mesh import Mesh
 from cube_sim.mesh_view import MeshView
 from cube_sim.led_cube import LEDCube, Face
 from cube_sim.grid import Grid
+from cube_sim.color import *
 
 import pygame as pg
 import numpy as np
@@ -99,7 +100,7 @@ class Particle():
     def __init__(self):
         self.pos = glm.vec2(0, 0)
         self.vel = glm.vec2(random.uniform(-MAX_SPEED, MAX_SPEED), random.uniform(-MAX_SPEED, MAX_SPEED))
-        self.col = glm.vec3(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
+        self.col = genRandomStrongColour()
         self.age = 0.0
 
     def update(self, dt):
@@ -127,7 +128,7 @@ class SphericalCoords(Application):
         self.grid.buildMesh()
 
         self.particles = []
-        for i in range(500):
+        for i in range(1000):
             self.particles.append(Particle())
 
         self.wireframe = True
@@ -146,12 +147,12 @@ class SphericalCoords(Application):
 
     def update(self, dt):
         dims = (self.led_cube.subdivision * self.led_cube.subdivision, 3)
-        col_zmin = np.ones(dims).astype(np.float32)
-        col_zmax = np.ones(dims).astype(np.float32)
-        col_ymin = np.ones(dims).astype(np.float32)
-        col_ymax = np.ones(dims).astype(np.float32)
-        col_xmin = np.ones(dims).astype(np.float32)
-        col_xmax = np.ones(dims).astype(np.float32)
+        col_zmin = np.zeros(dims).astype(np.float32)
+        col_zmax = np.zeros(dims).astype(np.float32)
+        col_ymin = np.zeros(dims).astype(np.float32)
+        col_ymax = np.zeros(dims).astype(np.float32)
+        col_xmin = np.zeros(dims).astype(np.float32)
+        col_xmax = np.zeros(dims).astype(np.float32)
 
         for p in self.particles:
             p.update(dt)
