@@ -21,13 +21,13 @@ class Face(IntEnum):
     BOTTOM = 5
 
 class LEDCube(Transform):
-    def __init__(self, subdivision):
+    def __init__(self, size):
         super().__init__()
-        self.subdivision = subdivision
+        self.size = size
         self.fill_count = 0
         self.outline_count = 0
-        self.mesh =         Mesh(self.subdivision * self.subdivision * 6 * 6)
-        self.mesh_outline = Mesh(self.subdivision * (self.subdivision + 1) * 4 * 6)
+        self.mesh =         Mesh(self.size * self.size * 6 * 6)
+        self.mesh_outline = Mesh(self.size * (self.size + 1) * 4 * 6)
         self.mesh_outline.mode = GL.GL_LINES
 
     def update(self):
@@ -60,7 +60,7 @@ class LEDCube(Transform):
         self.mesh_outline.updateNormals()
 
     def buildMesh(self):
-        filename = 'mesh' + str(self.subdivision) + 'x' + str(self.subdivision) + 'f.npz'
+        filename = 'mesh' + str(self.size) + 'x' + str(self.size) + 'f.npz'
         path = getResource(filename)
         try:
             npzfile = np.load(path)
@@ -81,7 +81,7 @@ class LEDCube(Transform):
         self.mesh.complete()
 
     def buildMeshOutline(self):
-        filename = 'mesh' + str(self.subdivision) + 'x' + str(self.subdivision) + 'o.npz'
+        filename = 'mesh' + str(self.size) + 'x' + str(self.size) + 'o.npz'
         path = getResource(filename)
         try:
             npzfile = np.load(path)
@@ -105,7 +105,7 @@ class LEDCube(Transform):
             self.mesh.addVertex(x, y, z, normal[0], normal[1], normal[2], normal[0], normal[1], normal[2])
             self.fill_count += 1
 
-        segments, step = np.linspace(-1, 1, self.subdivision, False, True)
+        segments, step = np.linspace(-1, 1, self.size, False, True)
     
         # X FRONT
         normal = np.array([1.0, 0.0, 0.0])
@@ -218,7 +218,7 @@ class LEDCube(Transform):
             self.outline_count += 1
 
         extent = 1
-        interval = 2 / (self.subdivision + 1)
+        interval = 2 / (self.size + 1)
         segments = np.linspace(-extent, extent, int((extent+1) / interval), True)
 
         # Z TOP and BOTTOM

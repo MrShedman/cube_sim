@@ -12,9 +12,14 @@ import OpenGL.GL as GL
 import numpy as np
 import glm
 from cube_sim.resource import getResource
+from cube_sim.camera import Camera
+from cube_sim.grid import Grid
+from cube_sim.led_cube import LEDCube
+from cube_sim.shader import Shader
+from cube_sim.mesh_view import MeshView
 
 class Application():
-    def __init__(self, w = 1280, h = 720, hz = 60):
+    def __init__(self, w = 1280, h = 720, hz = 60, cube_size = 64):
         pg.init()
         gl_version = (3, 2)
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, gl_version[0])
@@ -45,20 +50,26 @@ class Application():
         self.timePerFrame = 1/hz
         signal.signal(signal.SIGINT, self.close)
 
+        self.camera = Camera()
+        self.camera.setPosition(glm.vec3(-5.0, 0.0, 2.0))
+        self.camera.setPitch(math.radians(-20))
+
+        self.shader = Shader('model.vert', 'model.frag')
+
+        self.grid = Grid()
+        self.grid.buildMesh()
+
+        self.led_cube = LEDCube(cube_size)
+        self.led_cube.buildMesh()
+        self.led_cube.buildMeshOutline()
+        self.led_cube.setPosition(glm.vec3(0, 0, 1))
+
+        self.wireframe = True
+        self.cube_state = True
+
     def __del__(self):
         pg.quit()
 
-    def getInput(self):
-        events = pg.event.get()
-        for event in events:
-            if event.type == pg.QUIT:
-                self.close()
-            if (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
-                self.close()          
-            if event.type == pg.WINDOWRESIZED:
-                GL.glViewport(0, 0, event.dict['x'], event.dict['y'])
-            self.handleEvent(event)
-    
     def handleEvent(self, event):
         pass
 
@@ -67,6 +78,35 @@ class Application():
 
     def render(self):
         pass
+
+    def priv_handleEvent(self):
+        events = pg.event.get()
+        for event in events:
+            if event.type == pg.QUIT:
+                self.close()
+            if (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
+                self.close()          
+            if (event.type == pg.KEYDOWN and event.key == pg.K_m):
+                self.wireframe = not self.wireframe  
+            if (event.type == pg.KEYDOWN and event.key == pg.K_c):
+                self.cube_state = not self.cube_state 
+            if self.cube_state:
+                self.led_cube.makeCube()
+            else:
+                self.led_cube.makeSphere()
+            if event.type == pg.WINDOWRESIZED:
+                GL.glViewport(0, 0, event.dict['x'], event.dict['y'])        
+            self.camera.handleEvent(event)
+            self.handleEvent(event)
+
+    def priv_update(self, dt):
+        self.camera.update(dt)
+        self.update(dt)
+
+    def priv_render(self):
+        MeshView(self.led_cube, self.shader, self.camera).render(True, self.wireframe)
+        MeshView(self.grid, self.shader, self.camera).render(True, False, True)
+        self.render()
 
     def run(self):
         timeSinceLastUpdate = 0.0
@@ -80,12 +120,12 @@ class Application():
 
             while timeSinceLastUpdate > self.timePerFrame:
                 timeSinceLastUpdate -= self.timePerFrame
-                self.getInput()
-                self.update(self.timePerFrame)
+                self.priv_handleEvent()
+                self.priv_update(self.timePerFrame)
 
             GL.glClearColor(0.2, 0.2, 0.2, 0)
             GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-            self.render()
+            self.priv_render()
             pg.display.flip()
 
     def close(self, signum = 0, frame = 0):

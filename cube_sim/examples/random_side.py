@@ -16,49 +16,15 @@ import math
 
 class RandomSide(Application):
     def __init__(self):
-        super().__init__(1280, 720, 60)
-   
-        self.camera = Camera()
-        self.camera.setPosition(glm.vec3(-5.0, 0.0, 2.0))
-        self.camera.setPitch(math.radians(-20))
-
-        self.shader = Shader('model.vert', 'model.frag')
-
-        self.led_cube = LEDCube(64)
-        self.led_cube.buildMesh()
-        self.led_cube.buildMeshOutline()
-        self.led_cube.setPosition(glm.vec3(0, 0, 1))
-
-        self.grid = Grid()
-        self.grid.buildMesh()
-
-        self.wireframe = True
-        self.cube_state = True
-
-    def handleEvent(self, event):
-        if (event.type == pg.KEYDOWN and event.key == pg.K_m):
-            self.wireframe = not self.wireframe  
-        if (event.type == pg.KEYDOWN and event.key == pg.K_c):
-            self.cube_state = not self.cube_state 
-            if self.cube_state:
-                self.led_cube.makeCube()
-            else:
-                self.led_cube.makeSphere()          
-        self.camera.handleEvent(event)
+        super().__init__(1280, 720, 60, 64)
 
     def update(self, dt):
-        dims = (self.led_cube.subdivision * self.led_cube.subdivision, 3)
+        dims = (self.led_cube.size * self.led_cube.size, 3)
         colours = np.random.uniform(0, 1, dims).astype(np.float32)
         self.led_cube.updateFace(Face.LEFT, colours)
         self.led_cube.updateFace(Face.RIGHT, colours)
         self.led_cube.updateFace(Face.BOTTOM, colours)
         self.led_cube.update()
-
-        self.camera.update(dt)
-
-    def render(self):
-        MeshView(self.led_cube, self.shader, self.camera).render(True, self.wireframe)
-        MeshView(self.grid, self.shader, self.camera).render(True, False, True)
 
 if __name__ == "__main__":
     app = RandomSide()
