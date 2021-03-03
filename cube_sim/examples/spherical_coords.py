@@ -4,7 +4,6 @@ from cube_sim.application import Application
 from cube_sim.camera import Camera
 from cube_sim.led_cube import LEDCube, Face
 
-import pygame as pg
 import numpy as np
 import glm
 import math
