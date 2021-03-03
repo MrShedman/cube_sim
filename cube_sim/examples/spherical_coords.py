@@ -1,15 +1,9 @@
 #!/usr/bin/env python
 
 from cube_sim.application import Application
-from cube_sim.transform import Transform
-from cube_sim.shader import Shader
 from cube_sim.camera import Camera
-from cube_sim.mesh import Mesh
-from cube_sim.mesh_view import MeshView
 from cube_sim.led_cube import LEDCube, Face
-from cube_sim.grid import Grid
 
-import pygame as pg
 import numpy as np
 import glm
 import math
@@ -110,42 +104,14 @@ class Particle():
 
 class SphericalCoords(Application):
     def __init__(self):
-        super().__init__(1280, 720, 60)
-   
-        self.camera = Camera()
-        self.camera.setPosition(glm.vec3(-5.0, 0.0, 2.0))
-        self.camera.setPitch(math.radians(-20))
-
-        self.shader = Shader('model.vert', 'model.frag')
-
-        self.led_cube = LEDCube(64)
-        self.led_cube.buildMesh()
-        self.led_cube.buildMeshOutline()
-        self.led_cube.setPosition(glm.vec3(0, 0, 1))
-
-        self.grid = Grid()
-        self.grid.buildMesh()
+        super().__init__(1280, 720, 60, 64)
 
         self.particles = []
         for i in range(500):
             self.particles.append(Particle())
 
-        self.wireframe = True
-        self.cube_state = True
-
-    def handleEvent(self, event):
-        if (event.type == pg.KEYDOWN and event.key == pg.K_m):
-            self.wireframe = not self.wireframe  
-        if (event.type == pg.KEYDOWN and event.key == pg.K_c):
-            self.cube_state = not self.cube_state 
-            if self.cube_state:
-                self.led_cube.makeCube()
-            else:
-                self.led_cube.makeSphere()          
-        self.camera.handleEvent(event)
-
     def update(self, dt):
-        dims = (self.led_cube.subdivision * self.led_cube.subdivision, 3)
+        dims = (self.led_cube.size * self.led_cube.size, 3)
         col_zmin = np.ones(dims).astype(np.float32)
         col_zmax = np.ones(dims).astype(np.float32)
         col_ymin = np.ones(dims).astype(np.float32)
@@ -156,8 +122,8 @@ class SphericalCoords(Application):
         for p in self.particles:
             p.update(dt)
             face_id, uv_vec = getIndexFromSphereCoords(p.pos.x, p.pos.y)
-            uv_vec = glm.floor(uv_vec * 64)
-            uv = int(uv_vec.x + uv_vec.y * 64)
+            uv_vec = glm.floor(uv_vec * self.led_cube.size)
+            uv = int(uv_vec.x + uv_vec.y * self.led_cube.size)
 
             if face_id == 0:
                 col_xmax[uv] = p.col
@@ -182,12 +148,6 @@ class SphericalCoords(Application):
         self.led_cube.update()
 
         self.led_cube.rotateAngleAxis(dt * 0.1, glm.vec3(0, 0, 1))
-
-        self.camera.update(dt)
-
-    def render(self):
-        MeshView(self.led_cube, self.shader, self.camera).render(True, self.wireframe)
-        MeshView(self.grid, self.shader, self.camera).render(True, False, True)
 
 if __name__ == "__main__":
     app = SphericalCoords()
