@@ -39,6 +39,17 @@ class LEDCube(Transform):
         end = int(length*(int(face.value)+1))
         self.mesh.colours[start:end] = np.repeat(colours, 6, axis=0)
 
+    def updateFaces(self, colours):
+        self.mesh.colours = np.repeat(colours.reshape(6 * self.size * self.size, 3), 6, axis=0)
+
+    def getFaceArrayAsColour(self, colour):
+        shape = (self.size * self.size, 3)
+        return np.full(shape, [colour]).astype(np.float32)
+
+    def getCubeArrayAsColour(self, colour):
+        shape = (6, self.size * self.size, 3)
+        return np.full(shape, [colour]).astype(np.float32)
+
     def makeCube(self):
         self.mesh.positions = self.cube_positions
         self.mesh.normals = self.cube_normals
@@ -59,7 +70,7 @@ class LEDCube(Transform):
         self.mesh_outline.updatePositions()
         self.mesh_outline.updateNormals()
 
-    def buildMesh(self):
+    def buildMesh(self, forceGeneration=False):
         filename = 'mesh' + str(self.size) + 'x' + str(self.size) + 'f.npz'
         path = getResource(filename)
         try:

@@ -56,7 +56,7 @@ def getIndexFromSphereCoords(theta, phi):
         maxAxis = absY
         uc = x
         vc = -z
-        index = 2
+        index = 4
 
     # NEGATIVE Y
     if not isYPositive and absY >= absX and absY >= absZ:
@@ -65,7 +65,7 @@ def getIndexFromSphereCoords(theta, phi):
         maxAxis = absY
         uc = x
         vc = z
-        index = 3
+        index = 5
 
     # POSITIVE Z
     if isZPositive and absZ >= absX and absZ >= absY:
@@ -74,7 +74,7 @@ def getIndexFromSphereCoords(theta, phi):
         maxAxis = absZ
         uc = x
         vc = y
-        index = 4
+        index = 2
 
     # NEGATIVE Z
     if not isZPositive and absZ >= absX and absZ >= absY:
@@ -83,8 +83,8 @@ def getIndexFromSphereCoords(theta, phi):
         maxAxis = absZ
         uc = -x
         vc = y
-        index = 5
-
+        index = 3
+        
     # Convert range from -1 to 1 to 0 to 1
     u = 0.5 * (uc / maxAxis + 1.0)
     v = 0.5 * (vc / maxAxis + 1.0)
@@ -92,60 +92,42 @@ def getIndexFromSphereCoords(theta, phi):
 
 class Particle():
     def __init__(self):
-        self.pos = glm.vec2(0, 0)
+        self.pos = glm.vec2(random.uniform(-2.0 * math.pi, 2.0 * math.pi), random.uniform(-2.0 * math.pi, 2.0 * math.pi))
         self.vel = glm.vec2(random.uniform(-MAX_SPEED, MAX_SPEED), random.uniform(-MAX_SPEED, MAX_SPEED))
         self.col = genRandomStrongColour()
         self.age = 0.0
+        self.life = random.uniform(1, 3)
 
     def update(self, dt):
         self.pos += self.vel / dt
         self.pos = glm.mod(self.pos, 2.0 * math.pi)
-        # self.vel += 
         self.age += dt
+
+    def getColourFaded(self):
+        return fadeColour(self.col, 1 - (self.age / self.life))
 
 class SphericalCoords(Application):
     def __init__(self):
         super().__init__(1280, 720, 60, 64)
 
         self.particles = []
-        for i in range(1000):
+        for i in range(500):
             self.particles.append(Particle())
 
     def update(self, dt):
-        dims = (self.led_cube.size * self.led_cube.size, 3)
-        col_zmin = np.zeros(dims).astype(np.float32)
-        col_zmax = np.zeros(dims).astype(np.float32)
-        col_ymin = np.zeros(dims).astype(np.float32)
-        col_ymax = np.zeros(dims).astype(np.float32)
-        col_xmin = np.zeros(dims).astype(np.float32)
-        col_xmax = np.zeros(dims).astype(np.float32)
+        cube_faces = self.led_cube.getCubeArrayAsColour([0.1, 0.1, 0.1])
 
         for p in self.particles:
+            if p.age > p.life:
+                p.__init__()
             p.update(dt)
             face_id, uv_vec = getIndexFromSphereCoords(p.pos.x, p.pos.y)
             uv_vec = glm.floor(uv_vec * self.led_cube.size)
             uv = int(uv_vec.x + uv_vec.y * self.led_cube.size)
 
-            if face_id == 0:
-                col_xmax[uv] = p.col
-            if face_id == 1:
-                col_xmin[uv] = p.col
-            if face_id == 2:
-                col_ymax[uv] = p.col
-            if face_id == 3:
-                col_ymin[uv] = p.col
-            if face_id == 4:
-                col_zmax[uv] = p.col
-            if face_id == 5:
-                col_zmin[uv] = p.col
+            cube_faces[face_id, uv] = p.getColourFaded()
 
-        # y and z are flipped around because opengl
-        self.led_cube.updateFace(Face.BOTTOM,   col_ymin)
-        self.led_cube.updateFace(Face.TOP,      col_ymax)
-        self.led_cube.updateFace(Face.RIGHT,    col_zmin)
-        self.led_cube.updateFace(Face.LEFT,     col_zmax)
-        self.led_cube.updateFace(Face.BACK,     col_xmin)
-        self.led_cube.updateFace(Face.FRONT,    col_xmax)
+        self.led_cube.updateFaces(cube_faces)
         self.led_cube.update()
 
         self.led_cube.rotateAngleAxis(dt * 0.1, glm.vec3(0, 0, 1))
