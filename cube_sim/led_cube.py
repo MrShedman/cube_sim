@@ -73,16 +73,16 @@ class LEDCube(Transform):
     def buildMesh(self, forceGeneration=False):
         filename = 'mesh' + str(self.size) + 'x' + str(self.size) + 'f.npz'
         path = getResource(filename)
-        try:
+
+        if path.exists() and not forceGeneration:
             npzfile = np.load(path)
-        except IOError:
-            self.generateMesh()
-            np.savez(path, positions=self.mesh.positions, normals=self.mesh.normals, colours=self.mesh.colours, indices=self.mesh.indices)
-        else:
             self.mesh.positions = npzfile['positions']
             self.mesh.normals = npzfile['normals']
             self.mesh.colours = npzfile['colours']
             self.mesh.indices = npzfile['indices']
+        else:
+            self.generateMesh()
+            np.savez(path, positions=self.mesh.positions, normals=self.mesh.normals, colours=self.mesh.colours, indices=self.mesh.indices)
 
         self.cube_positions = self.mesh.positions
         self.cube_normals = self.mesh.normals
@@ -91,19 +91,20 @@ class LEDCube(Transform):
 
         self.mesh.complete()
 
-    def buildMeshOutline(self):
+    def buildMeshOutline(self, forceGeneration=False):
         filename = 'mesh' + str(self.size) + 'x' + str(self.size) + 'o.npz'
         path = getResource(filename)
-        try:
+
+        if path.exists() and not forceGeneration:
             npzfile = np.load(path)
-        except IOError: 
-            self.generateMeshOutline()
-            np.savez(path, positions=self.mesh_outline.positions, normals=self.mesh_outline.normals, colours=self.mesh_outline.colours, indices=self.mesh_outline.indices)
-        else:
             self.mesh_outline.positions = npzfile['positions']
             self.mesh_outline.normals = npzfile['normals']
             self.mesh_outline.colours = npzfile['colours']
             self.mesh_outline.indices = npzfile['indices']
+        else:
+            self.generateMeshOutline()
+            np.savez(path, positions=self.mesh_outline.positions, normals=self.mesh_outline.normals, colours=self.mesh_outline.colours, indices=self.mesh_outline.indices)
+
         self.cube_outline_positions = self.mesh_outline.positions
         self.cube_outline_normals = self.mesh_outline.normals
         self.sphere_outline_positions = self.mesh_outline.positions / np.linalg.norm(self.mesh_outline.positions, axis=1, keepdims=True) * sqrt(3.0)
