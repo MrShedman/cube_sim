@@ -10,7 +10,7 @@ class RandomSide(Application):
         super().__init__(1280, 720, 60, 64)
 
     def update(self, dt):
-        dims = (self.led_cube.size, self.led_cube.size, 3)
+        dims = (self.led_cube.size * self.led_cube.size, 3)
         colours = np.random.uniform(0, 1, dims).astype(np.float32)
         self.led_cube.updateFace(Face.LEFT, colours)
         self.led_cube.updateFace(Face.RIGHT, colours)
