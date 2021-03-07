@@ -16,6 +16,7 @@ out vec3 frag_pos;
 out vec3 frag_colour;
 out vec3 frag_lightPos;
 flat out vec3 vert_pos;
+out vec3 vert_pos_smooth;
 
 void main()
 {
@@ -25,4 +26,5 @@ void main()
     frag_colour = vertex_colour;
     frag_lightPos = vec3(view * vec4(lightPos, 1.0));
     vert_pos = vertex_center;
+    vert_pos_smooth = vertex_center;
 }
