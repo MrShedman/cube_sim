@@ -117,13 +117,13 @@ class SphericalCoords(Application):
             self.particles.append(Particle())
 
     def update(self, dt):
-        cube_faces = self.led_cube.getCubeArrayAsColour([0.8, 0.8, 0.8])
-        
+        cube_faces = self.led_cube.getCubeArrayAsColour([0.1, 0.1, 0.1])
+
         for p in self.particles:
             p.update(dt)
             face_id, uv_vec = getIndexFromSphereCoords(p.pos.x, p.pos.y)
             uv_vec = glm.ivec2(glm.floor(uv_vec * self.led_cube.size))
-            cube_faces[face_id, uv_vec.y, uv_vec.x] = p.getColourFaded()
+            cube_faces[face_id, uv_vec.x, uv_vec.y] = p.getColourFaded()
 
         self.led_cube.updateFaces(cube_faces)
         self.led_cube.update()
