@@ -77,8 +77,8 @@ class Application():
         pass
 
     def render(self):
-        pass
-
+        MeshView(self.led_cube, self.shader, self.camera).render(True, self.wireframe)
+    
     def priv_handleEvent(self):
         events = pg.event.get()
         for event in events:
@@ -104,7 +104,6 @@ class Application():
         self.update(dt)
 
     def priv_render(self):
-        MeshView(self.led_cube, self.shader, self.camera).render(True, self.wireframe)
         MeshView(self.grid, self.shader, self.camera).render(True, False, True)
         self.render()
 
