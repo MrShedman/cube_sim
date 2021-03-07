@@ -37,17 +37,17 @@ class LEDCube(Transform):
         length = int(len(self.mesh.colours)/6)
         start = int(length*int(face.value))
         end = int(length*(int(face.value)+1))
-        self.mesh.colours[start:end] = np.repeat(colours, 6, axis=0)
+        self.mesh.colours[start:end] = np.repeat(colours.reshape(self.size * self.size, 3), 6, axis=0)
 
     def updateFaces(self, colours):
         self.mesh.colours = np.repeat(colours.reshape(6 * self.size * self.size, 3), 6, axis=0)
 
     def getFaceArrayAsColour(self, colour):
-        shape = (self.size * self.size, 3)
+        shape = (self.size, self.size, 3)
         return np.full(shape, [colour]).astype(np.float32)
 
     def getCubeArrayAsColour(self, colour):
-        shape = (6, self.size * self.size, 3)
+        shape = (6, self.size, self.size, 3)
         return np.full(shape, [colour]).astype(np.float32)
 
     def makeCube(self):
@@ -121,8 +121,8 @@ class LEDCube(Transform):
     
         # X FRONT
         normal = np.array([1.0, 0.0, 0.0])
-        for i in segments:
-            for j in reversed(segments):
+        for j in reversed(segments):
+            for i in segments:
                 top = i
                 bottom = i + step
                 left = j
@@ -138,8 +138,8 @@ class LEDCube(Transform):
 
         # X BACK
         normal = np.array([-1.0, 0.0, 0.0])
-        for i in segments:
-            for j in segments:
+        for j in segments:
+            for i in segments:
                 top = i
                 bottom = i + step
                 left = j
@@ -155,8 +155,8 @@ class LEDCube(Transform):
 
         # Y LEFT
         normal = np.array([0.0, 1.0, 0.0])
-        for i in segments:
-            for j in segments:
+        for j in segments:
+            for i in segments:
                 top = i
                 bottom = i + step
                 left = j
@@ -172,8 +172,8 @@ class LEDCube(Transform):
 
         # Y RIGHT
         normal = np.array([0.0, -1.0, 0.0])
-        for i in segments:
-            for j in reversed(segments):
+        for j in reversed(segments):
+            for i in segments:
                 top = i
                 bottom = i + step
                 left = j
@@ -189,8 +189,8 @@ class LEDCube(Transform):
 
         # Z TOP
         normal = np.array([0.0, 0.0, 1.0])
-        for i in reversed(segments):
-            for j in segments:
+        for j in segments:
+            for i in reversed(segments):
                 top = i
                 bottom = i + step
                 left = j
@@ -206,8 +206,8 @@ class LEDCube(Transform):
 
         # Z BOTTOM
         normal = np.array([0.0, 0.0, -1.0])
-        for i in segments:
-            for j in segments:
+        for j in segments:
+            for i in segments:
                 top = i
                 bottom = i + step
                 left = j

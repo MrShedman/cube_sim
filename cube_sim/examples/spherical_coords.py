@@ -96,15 +96,17 @@ class Particle():
         self.vel = glm.vec2(random.uniform(-MAX_SPEED, MAX_SPEED), random.uniform(-MAX_SPEED, MAX_SPEED))
         self.col = genRandomStrongColour()
         self.age = 0.0
-        self.life = random.uniform(1, 3)
+        self.eol = random.uniform(1, 3) # end of life
 
     def update(self, dt):
         self.pos += self.vel / dt
         self.pos = glm.mod(self.pos, 2.0 * math.pi)
         self.age += dt
+        if (self.age > self.eol):
+            self.__init__()
 
     def getColourFaded(self):
-        return fadeColour(self.col, 1 - (self.age / self.life))
+        return fadeColour(self.col, 1 - (self.age / self.eol))
 
 class SphericalCoords(Application):
     def __init__(self):
@@ -118,14 +120,10 @@ class SphericalCoords(Application):
         cube_faces = self.led_cube.getCubeArrayAsColour([0.1, 0.1, 0.1])
 
         for p in self.particles:
-            if p.age > p.life:
-                p.__init__()
             p.update(dt)
             face_id, uv_vec = getIndexFromSphereCoords(p.pos.x, p.pos.y)
-            uv_vec = glm.floor(uv_vec * self.led_cube.size)
-            uv = int(uv_vec.x + uv_vec.y * self.led_cube.size)
-
-            cube_faces[face_id, uv] = p.getColourFaded()
+            uv_vec = glm.ivec2(glm.floor(uv_vec * self.led_cube.size))
+            cube_faces[face_id, uv_vec.x, uv_vec.y] = p.getColourFaded()
 
         self.led_cube.updateFaces(cube_faces)
         self.led_cube.update()
