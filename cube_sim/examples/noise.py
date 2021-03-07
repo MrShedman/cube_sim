@@ -25,15 +25,20 @@ class Noise(Application):
         self.vbo.set_slot(3, 3)
 
         self.noise_scale = 1.0
+        self.noise_speed = 1.0
 
     def handleEvent(self, event):
         if (event.type == pg.KEYDOWN and event.key == pg.K_r):
             self.noise_scale += 0.1  
         if (event.type == pg.KEYDOWN and event.key == pg.K_f):
             self.noise_scale -= 0.1
+        if (event.type == pg.KEYDOWN and event.key == pg.K_t):
+            self.noise_speed += 0.1  
+        if (event.type == pg.KEYDOWN and event.key == pg.K_g):
+            self.noise_speed -= 0.1
 
     def update(self, dt):
-        self.life += dt
+        self.life += dt * self.noise_speed
         self.led_cube.rotateAngleAxis(dt * 0.1, glm.vec3(0, 0, 1))
     
     def render(self):
