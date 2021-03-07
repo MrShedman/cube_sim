@@ -122,10 +122,8 @@ class SphericalCoords(Application):
         for p in self.particles:
             p.update(dt)
             face_id, uv_vec = getIndexFromSphereCoords(p.pos.x, p.pos.y)
-            uv_vec = glm.floor(uv_vec * self.led_cube.size)
-            uv = int(uv_vec.x + uv_vec.y * self.led_cube.size)
-
-            cube_faces[face_id, uv] = p.getColourFaded()
+            uv_vec = glm.ivec2(glm.floor(uv_vec * self.led_cube.size))
+            cube_faces[face_id, uv_vec.x, uv_vec.y] = p.getColourFaded()
 
         self.led_cube.updateFaces(cube_faces)
         self.led_cube.update()
