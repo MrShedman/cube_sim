@@ -37,17 +37,17 @@ class LEDCube(Transform):
         length = int(len(self.mesh.colours)/6)
         start = int(length*int(face.value))
         end = int(length*(int(face.value)+1))
-        self.mesh.colours[start:end] = np.repeat(colours, 6, axis=0)
+        self.mesh.colours[start:end] = np.repeat(colours.reshape(self.size * self.size, 3), 6, axis=0)
 
     def updateFaces(self, colours):
         self.mesh.colours = np.repeat(colours.reshape(6 * self.size * self.size, 3), 6, axis=0)
 
     def getFaceArrayAsColour(self, colour):
-        shape = (self.size * self.size, 3)
+        shape = (self.size, self.size, 3)
         return np.full(shape, [colour]).astype(np.float32)
 
     def getCubeArrayAsColour(self, colour):
-        shape = (6, self.size * self.size, 3)
+        shape = (6, self.size, self.size, 3)
         return np.full(shape, [colour]).astype(np.float32)
 
     def makeCube(self):
