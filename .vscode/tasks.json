@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "command": "python3",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+
+            "label": "Run Release",
+
+            "presentation": {
+                "reveal": "always"
+            },
+
+            "args": ["-m", "cube_sim.examples.noise"]
+        }
+    ]
+}
