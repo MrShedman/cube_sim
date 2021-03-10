@@ -35,11 +35,13 @@ class Conway(Application):
              [0, 0, 0, 1, 1],
              [0, 1, 1, 0, 1],
              [1, 0, 1, 0, 1]]
+
+        # TODO: Put into list     
         self.conway_back = np.zeros((self.led_cube.size+2, self.led_cube.size+2)).astype(bool)
         self.conway_left = np.zeros_like(self.conway_back)
         self.conway_top = np.zeros_like(self.conway_back)
        
-
+        # Todo Put into list
         dims = (self.led_cube.size, self.led_cube.size, 3) # 64x64 RGB
         self.displayed_back = np.zeros(dims).astype(np.float32)
         self.displayed_left = np.zeros_like(self.displayed_back)
@@ -111,6 +113,9 @@ class Conway(Application):
         self.led_cube.updateFace(Face.LEFT, self.displayed_left)
         self.led_cube.updateFace(Face.TOP, self.displayed_top)
         self.led_cube.update()
+
+        # Todo check if patttern has existed in the last N interations. If so, start new pattern
+        # deque
 
         # time.sleep(0.1)
 
