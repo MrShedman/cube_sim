@@ -8,4 +8,4 @@ setup(name="cube_sim",
       author_email="MrShedMan",
       url="https://github.com/MrShedman/cube_sim",
       packages=find_packages(),
-      install_requires=["pygame", "numpy", "PyGLM", "PyOpenGL"])
+      install_requires=["pygame", "numpy", "PyGLM", "PyOpenGL", "scipy"])
