@@ -12,7 +12,7 @@ import OpenGL.GL as GL
 import numpy as np
 import glm
 from cube_sim.resource import getResource
-from cube_sim.camera import Camera
+from cube_sim.camera import CameraFPS, CameraOrbit
 from cube_sim.grid import Grid
 from cube_sim.led_cube import LEDCube
 from cube_sim.shader import Shader
@@ -50,9 +50,11 @@ class Application():
         self.timePerFrame = 1/hz
         signal.signal(signal.SIGINT, self.close)
 
-        self.camera = Camera()
-        self.camera.setPosition(glm.vec3(-5.0, 0.0, 2.0))
-        self.camera.setPitch(math.radians(-20))
+        self.camera = CameraOrbit()
+        self.camera.setPosition(glm.vec3(-5.0, 0.0, 1.0))
+        #self.camera = CameraFPS()
+        #self.camera.setPosition(glm.vec3(-5.0, 0.0, 2.0))
+        #self.camera.rotateAngleAxis(math.radians(-15), glm.vec3(0, 1, 0))
 
         self.shader = Shader('model.vert', 'model.frag')
 
@@ -77,8 +79,8 @@ class Application():
         pass
 
     def render(self):
-        pass
-
+        MeshView(self.led_cube, self.shader, self.camera).render(True, self.wireframe)
+    
     def priv_handleEvent(self):
         events = pg.event.get()
         for event in events:
@@ -104,7 +106,6 @@ class Application():
         self.update(dt)
 
     def priv_render(self):
-        MeshView(self.led_cube, self.shader, self.camera).render(True, self.wireframe)
         MeshView(self.grid, self.shader, self.camera).render(True, False, True)
         self.render()
 
