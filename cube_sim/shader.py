@@ -40,8 +40,9 @@ class Shader():
         log = GL.glGetShaderInfoLog(vertex)
         if isinstance(log, bytes):
             log = log.decode()
-        for line in log.split("\n"):
-            print(line)
+        if len(log) > 0:
+            for line in log.split("\n"):
+                print(line)
 
         GL.glAttachShader(self.program, vertex)
         GL.glShaderSource(fragment, fragment_code)
@@ -51,8 +52,9 @@ class Shader():
         log = GL.glGetShaderInfoLog(fragment)
         if isinstance(log, bytes):
             log = log.decode()
-        for line in log.split("\n"):
-            print(line)
+        if len(log) > 0:
+            for line in log.split("\n"):
+                print(line)
 
         GL.glAttachShader(self.program, fragment)
         GL.glValidateProgram(self.program)
@@ -60,6 +62,9 @@ class Shader():
 
         GL.glDetachShader(self.program, vertex)
         GL.glDetachShader(self.program, fragment)
+
+    def isLinked(self):
+        return GL.glGetProgramiv(self.program, GL.GL_LINK_STATUS, None) == 1
 
     def cacheUniform(self, uniform):
         if uniform not in self.uniforms:
