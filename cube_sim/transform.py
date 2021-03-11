@@ -26,7 +26,7 @@ class Transform():
         self.setPosition(self.position + offset)
 
     def setRotation(self, rotation):
-        self.rotation = rotation
+        self.rotation = glm.normalize(rotation)
         self.transform_dirty = True
         self.inv_transform_dirty = True
 
@@ -35,11 +35,11 @@ class Transform():
         self.setRotation(rot)
 
     def rotate(self, rotation):
-        self.setRotation(glm.normalize(rotation * self.rotation))
+        self.setRotation(self.rotation * rotation)
 
     def rotateAngleAxis(self, angle, axis):
         rot = glm.angleAxis(angle, glm.normalize(axis))
-        self.setRotation(glm.normalize(rot) * self.rotation)
+        self.setRotation(self.rotation * rot)
 
     def rotateAroundPoint(self, angle, axis, pivot):
         rot = glm.angleAxis(angle, glm.normalize(axis))
@@ -67,6 +67,30 @@ class Transform():
     
     def getOrigin(self):
         return self.origin
+
+    def getUp(self):
+        rot = glm.mat3_cast(self.getRotation())
+        return glm.vec3(0, 0, 1) * rot
+
+    def getDown(self):
+        rot = glm.mat3_cast(self.getRotation())
+        return glm.vec3(0, 0, -1) * rot
+
+    def getLeft(self):
+        rot = glm.mat3_cast(self.getRotation())
+        return glm.vec3(0, 1, 0) * rot
+
+    def getRight(self):
+        rot = glm.mat3_cast(self.getRotation())
+        return glm.vec3(0, -1, 0) * rot
+
+    def getForward(self):
+        rot = glm.mat3_cast(self.getRotation())
+        return glm.vec3(1, 0, 0) * rot
+
+    def getBack(self):
+        rot = glm.mat3_cast(self.getRotation())
+        return glm.vec3(-1, 0, 0) * rot
 
     def getTransform(self):
         if self.transform_dirty:
