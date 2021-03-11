@@ -94,7 +94,9 @@ class Conway(Application):
 
         self.displayed_back[:,:,0] = self.conway_back.astype(np.float32)[1:65,1:65]
         self.displayed_left[:,:,1] = self.conway_left.astype(np.float32)[1:65,1:65]
-        self.displayed_top[:,:,2] = self.conway_top.astype(np.float32)[1:65,1:65]
+
+        self.displayed_top[:,:,1] = self.conway_top.astype(np.float32)[1:65,1:65]
+        self.displayed_top[:,:,0] = self.conway_top.astype(np.float32)[1:65,1:65]
 
         # Back/Left Join
         # self.displayed_back[:,-1,1] = 1       
