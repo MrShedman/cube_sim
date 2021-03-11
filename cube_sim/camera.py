@@ -186,10 +186,10 @@ class CameraFPS(Camera):
             self.position += self.getForward() * movAmt
 
         if pg.key.get_pressed()[pg.K_s]:
-            self.position -= self.getForward() * movAmt
+            self.position += self.getBack() * movAmt
 
         if pg.key.get_pressed()[pg.K_a]:
-            self.position -= self.getRight() * movAmt
+            self.position += self.getLeft() * movAmt
 
         if pg.key.get_pressed()[pg.K_d]:
             self.position += self.getRight() * movAmt

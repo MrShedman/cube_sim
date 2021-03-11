@@ -69,28 +69,22 @@ class Transform():
         return self.origin
 
     def getUp(self):
-        rot = glm.mat3_cast(self.getRotation())
-        return glm.vec3(0, 0, 1) * rot
+        return glm.vec3(0, 0, 1) * self.getRotation()
 
     def getDown(self):
-        rot = glm.mat3_cast(self.getRotation())
-        return glm.vec3(0, 0, -1) * rot
+        return glm.vec3(0, 0, -1) * self.getRotation()
 
     def getLeft(self):
-        rot = glm.mat3_cast(self.getRotation())
-        return glm.vec3(0, 1, 0) * rot
+        return glm.vec3(0, 1, 0) * self.getRotation()
 
     def getRight(self):
-        rot = glm.mat3_cast(self.getRotation())
-        return glm.vec3(0, -1, 0) * rot
+        return glm.vec3(0, -1, 0) * self.getRotation()
 
     def getForward(self):
-        rot = glm.mat3_cast(self.getRotation())
-        return glm.vec3(1, 0, 0) * rot
+        return glm.vec3(1, 0, 0) * self.getRotation()
 
     def getBack(self):
-        rot = glm.mat3_cast(self.getRotation())
-        return glm.vec3(-1, 0, 0) * rot
+        return glm.vec3(-1, 0, 0) * self.getRotation()
 
     def getTransform(self):
         if self.transform_dirty:
