@@ -40,12 +40,16 @@ class Conway(Application):
         self.conway_back = np.zeros((self.led_cube.size+2, self.led_cube.size+2)).astype(bool)
         self.conway_left = np.zeros_like(self.conway_back)
         self.conway_top = np.zeros_like(self.conway_back)
-       
+        self.conway_bottom = np.zeros_like(self.conway_back)
+        self.conway_right = np.zeros_like(self.conway_back)
+
         # Todo Put into list
         dims = (self.led_cube.size, self.led_cube.size, 3) # 64x64 RGB
         self.displayed_back = np.zeros(dims).astype(np.float32)
         self.displayed_left = np.zeros_like(self.displayed_back)
         self.displayed_top = np.zeros_like(self.displayed_back)  
+        self.displayed_bottom = np.zeros_like(self.displayed_back) 
+        self.displayed_right = np.zeros_like(self.displayed_back) 
 
         # Starting Configuration
         offset = 40
@@ -53,15 +57,17 @@ class Conway(Application):
         self.conway_left[15:20, 18:23] = unbounded
         self.conway_top[15+20 : 20+20, 18:23] = unbounded
 
-        self.led_cube.rotateAngleAxis(np.deg2rad(45), glm.vec3(0, 0, 1))
-        self.led_cube.rotateAngleAxis(np.deg2rad(-10), glm.vec3(1, 0, 0))
-        self.led_cube.rotateAngleAxis(np.deg2rad(-10), glm.vec3(0, 1, 0))
+        # self.led_cube.rotateAngleAxis(np.deg2rad(45), glm.vec3(0, 0, 1))
+        # self.led_cube.rotateAngleAxis(np.deg2rad(-10), glm.vec3(1, 0, 0))
+        # self.led_cube.rotateAngleAxis(np.deg2rad(-10), glm.vec3(0, 1, 0))
 
     def update(self, dt):
 
         self.conway_back = life_step(self.conway_back)
         self.conway_left = life_step(self.conway_left)
         self.conway_top = life_step(self.conway_top)
+        self.conway_bottom = life_step(self.conway_bottom)
+        self.conway_right = life_step(self.conway_right)
 
         # Back-Left Join
         self.conway_left[:,0] = self.conway_back[:,-2]
@@ -74,6 +80,14 @@ class Conway(Application):
         # Top-Left Join
         self.conway_top[0,:] = self.conway_left[-2,:]
         self.conway_left[-1,:] = self.conway_top[1,:]
+
+        # Bottom-left Join
+        self.conway_left[0,:] = self.conway_bottom[-2,:]
+        self.conway_bottom[-1,:] = self.conway_left[1,:]
+
+        # Bottom-back Join
+        self.conway_bottom[:,0] = self.conway_back[1,:]
+        self.conway_back[0,:] = self.conway_bottom[:,1]
 
 
      
@@ -93,10 +107,17 @@ class Conway(Application):
         # print(a[1:67,1:67])
 
         self.displayed_back[:,:,0] = self.conway_back.astype(np.float32)[1:65,1:65]
+
         self.displayed_left[:,:,1] = self.conway_left.astype(np.float32)[1:65,1:65]
 
         self.displayed_top[:,:,1] = self.conway_top.astype(np.float32)[1:65,1:65]
         self.displayed_top[:,:,0] = self.conway_top.astype(np.float32)[1:65,1:65]
+
+        self.displayed_bottom[:,:,1] = self.conway_bottom.astype(np.float32)[1:65,1:65]
+        self.displayed_bottom[:,:,1] = self.conway_bottom.astype(np.float32)[1:65,1:65]
+
+        self.displayed_right[:,:,0] = self.conway_right.astype(np.float32)[1:65,1:65]
+        self.displayed_right[:,:,2] = self.conway_right.astype(np.float32)[1:65,1:65]       
 
         # Back/Left Join
         # self.displayed_back[:,-1,1] = 1       
@@ -110,10 +131,24 @@ class Conway(Application):
         # self.displayed_top[0,:,:] = 1
         # self.displayed_left[-1,:,:] = 1
 
+        # Bottom-left Join
+        # self.displayed_left[0,:,:] = 1
+        # self.displayed_bottom[-1,:,:] = 1
+
+        # Bottom-back Join
+        # self.displayed_bottom[:,0,:] = 1
+        # self.displayed_back[0,:,:] = 1
+
+        # Bottom-right Join
+        self.displayed_bottom[0,:,:] = 1
+        self.displayed_right[0,:,:] = 1
+
 
         self.led_cube.updateFace(Face.BACK, self.displayed_back)
         self.led_cube.updateFace(Face.LEFT, self.displayed_left)
         self.led_cube.updateFace(Face.TOP, self.displayed_top)
+        self.led_cube.updateFace(Face.BOTTOM, self.displayed_bottom)
+        self.led_cube.updateFace(Face.RIGHT, self.displayed_right)
         self.led_cube.update()
 
         # Todo check if patttern has existed in the last N interations. If so, start new pattern
