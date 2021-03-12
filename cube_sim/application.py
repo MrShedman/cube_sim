@@ -92,10 +92,10 @@ class Application():
                 self.wireframe = not self.wireframe  
             if (event.type == pg.KEYDOWN and event.key == pg.K_c):
                 self.cube_state = not self.cube_state 
-            if self.cube_state:
-                self.led_cube.makeCube()
-            else:
-                self.led_cube.makeSphere()
+                if self.cube_state:
+                    self.led_cube.makeCube()
+                else:
+                    self.led_cube.makeSphere()
             if event.type == pg.WINDOWRESIZED:
                 GL.glViewport(0, 0, event.dict['x'], event.dict['y'])        
             self.camera.handleEvent(event)
