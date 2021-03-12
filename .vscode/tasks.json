@@ -14,7 +14,7 @@
                 "reveal": "always"
             },
 
-            "args": ["-m", "cube_sim.examples.noise"]
+            "args": ["-m", "cube_sim.examples.endless_surface"]
         }
     ]
 }
