@@ -52,9 +52,9 @@ class Application():
 
         self.camera = CameraOrbit()
         self.camera.setPosition(glm.vec3(-5.0, 0.0, 1.0))
-        #self.camera = CameraFPS()
-        #self.camera.setPosition(glm.vec3(-5.0, 0.0, 2.0))
-        #self.camera.rotateAngleAxis(math.radians(-15), glm.vec3(0, 1, 0))
+        # self.camera = CameraFPS()
+        # self.camera.setPosition(glm.vec3(-5.0, 0.0, 2.0))
+        # self.camera.rotateAngleAxis(math.radians(-15), glm.vec3(0, 1, 0))
 
         self.shader = Shader('model.vert', 'model.frag')
 
