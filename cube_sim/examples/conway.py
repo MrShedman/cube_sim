@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# THIS DOES NOT WORK YET!!!
+
 
 from cube_sim.application import Application
 from cube_sim.led_cube import LEDCube, Face
@@ -10,6 +10,8 @@ import glm
 import numpy as np
 import time
 
+
+import copy
 
 # def life_step(X):
 #     """Game of life step using generator expressions"""
@@ -56,13 +58,20 @@ class Conway(Application):
         # Starting Configuration
         offset = 40
         self.conway_back[15:20, 18+offset:23+offset] = unbounded
-        self.conway_left[15:20, 18:23] = unbounded
+        self.conway_left[15+30:20+30, 18:23] = unbounded
         self.conway_top[15+20 : 20+20, 18:23] = unbounded
-        self.conway_right[15+20 : 20+20, 18:23] = unbounded
+        # self.conway_right[15+20 : 20+20, 18:23] = unbounded
+        # self.conway_front[15+10 : 20+10, 18+40:23+40] = unbounded
+        # self.conway_bottom[15+10 : 20+10, 18:23] = unbounded
 
         # self.led_cube.rotateAngleAxis(np.deg2rad(45), glm.vec3(0, 0, 1))
         # self.led_cube.rotateAngleAxis(np.deg2rad(-10), glm.vec3(1, 0, 0))
         # self.led_cube.rotateAngleAxis(np.deg2rad(-10), glm.vec3(0, 1, 0))
+    def blockCorners(self, array):
+        array[0,0] = 0
+        array[-1,0] = 0
+        array[-1,-1] = 0
+        array[0, -1] = 0
 
     def update(self, dt):
 
@@ -72,6 +81,16 @@ class Conway(Application):
         self.conway_bottom = life_step(self.conway_bottom)
         self.conway_right = life_step(self.conway_right)
         self.conway_front = life_step(self.conway_front)
+
+ 
+        self.blockCorners(self.conway_back)
+        self.blockCorners(self.conway_left)
+        self.blockCorners(self.conway_top)
+        self.blockCorners(self.conway_bottom)
+        self.blockCorners(self.conway_right)
+        self.blockCorners(self.conway_front)
+
+        # TODO assert self.conway_back == temp MAKE SURE ARRAYS ARE BEING CHANGED IN BLOCK CORNERS
 
         # Back-Left Join
         self.conway_left[0,:] = self.conway_back[-2,:]
@@ -113,12 +132,13 @@ class Conway(Application):
         self.conway_front[:,0] = np.flip(self.conway_bottom[-2,:])
         self.conway_bottom[-1,:] = np.flip(self.conway_front[:,1])
 
+        # Front-right
+        self.conway_front[-1,:] = self.conway_right[1,:]
+        self.conway_right[0,:] = self.conway_front[-2,:]
 
-
-  
-
-        
-
+        # Back-right
+        self.conway_back[0,:] = self.conway_right[-2,:]
+        self.conway_right[-1,:] = self.conway_back[1,:]
 
         # Convert conway to colours
         self.displayed_back[:,:,0] = self.conway_back.astype(np.float32)[1:65,1:65]
@@ -174,8 +194,16 @@ class Conway(Application):
         # self.displayed_left[-1,1:10,:] = 1
 
         # Front-bottom join
-        self.displayed_front[1:10,0,:] = 1
-        self.displayed_bottom[-1,1:10,:] = 1
+        # self.displayed_front[1:10,0,:] = 1
+        # self.displayed_bottom[-1,1:10,:] = 1
+
+        # Front-right join
+        # self.displayed_front[-1,1:10,:] = 1
+        # self.displayed_right[0,1:10,:] = 1
+
+        # Back-right
+        # self.displayed_back[0,1:10,:] = 1
+        # self.displayed_right[-1,1:10,:] = 1
 
 
 
