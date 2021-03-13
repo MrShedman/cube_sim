@@ -6,11 +6,12 @@ from cube_sim.led_cube import LEDCube, Face
 from cube_sim.color import *
 
 import numpy as np
+import pygame as pg
 import glm
 import math
 import random
 
-MAX_SPEED = 0.015
+MAX_SPEED = 0.0075#15
 
 class Particle():
     def __init__(self, dims):
@@ -25,7 +26,7 @@ class Particle():
         signy = (random.randint(0, 1) * 2) - 1
         self.vel = glm.vec2(speedx * signx, speedy * signy)
         self.col = genRandomStrongColour()
-        self.trail = random.uniform(4, 20)
+        self.trail = random.uniform(8, 64)
         i = np.argmax(self.vel)
         self.vel[i] = self.vel[i]
         self.vel[i^1] = 0
@@ -132,12 +133,36 @@ class Particle():
 
         if add2list:
             self.addNewPos(self.face, self.pos)
+            # if random.uniform(0, 9) > 8:
+            #     # self.vel.x, self.vel.y = self.vel.y, self.vel.x
+            #     rot = random.randint(-1, 1) * math.pi/2.0
+            #     t = glm.rotate(glm.mat4(1), rot, glm.vec3(0, 0, 1))
+            #     self.vel = (glm.vec4(self.vel, 0, 0) * t).xy
+
+        if self.selfIntersect():
+            self.__init__(self.dims+1)
+
+    def left(self):
+        t = glm.rotate(glm.mat4(1), math.pi/2, glm.vec3(0, 0, 1))
+        self.vel = (glm.vec4(self.vel, 0, 0) * t).xy
+ 
+    def right(self):
+        t = glm.rotate(glm.mat4(1), -math.pi/2, glm.vec3(0, 0, 1))
+        self.vel = (glm.vec4(self.vel, 0, 0) * t).xy
+
+    def selfIntersect(self):
+        return len(self.pos_list) != len(set(self.pos_list))
 
     def addNewPos(self, face, pos):
         pos = glm.ivec2(pos)
-        self.pos_list = [(face, pos)] + self.pos_list   #add new at front
-        if len(self.pos_list) > self.trail:
-            self.pos_list = self.pos_list[:-1]      #remove last
+        if len(self.pos_list) > 0:
+            f, p = self.pos_list[0]
+            if f != face or p != pos: # something is causing duplicates to be added to the front triggering self intersection
+                self.pos_list = [(face, pos)] + self.pos_list   #add new at front
+                if len(self.pos_list) > self.trail:
+                    self.pos_list = self.pos_list[:-1]      #remove last
+        else:
+            self.pos_list = [(face, pos)] + self.pos_list   #add new at front
 
     def getPosition(self, i):
         return self.pos_list[i]
@@ -150,8 +175,14 @@ class EndlessSurface(Application):
         super().__init__(1280, 720, 60, 64)
 
         self.particles = []
-        for i in range(100):
+        for i in range(50):
             self.particles.append(Particle(self.led_cube.size))
+
+    def handleEvent(self, event):
+        if (event.type == pg.KEYDOWN and event.key == pg.K_a):
+            self.particles[0].left() 
+        if (event.type == pg.KEYDOWN and event.key == pg.K_d):
+            self.particles[0].right()
 
     def update(self, dt):
         cube_faces = self.led_cube.getCubeArrayAsColour([0.1, 0.1, 0.1])
