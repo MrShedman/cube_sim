@@ -41,17 +41,28 @@ class Snake(MovingCell):
         self.length = random.uniform(2, 4)
         self.tail = list()
 
-    def step(self):
-        pos = glm.ivec2(self.fpos)
-        if len(self.tail) > 0:
-            frontCell = self.tail[0]
-            # something is causing duplicates to be added to the front triggering self intersection
-            if frontCell.face != self.face or frontCell.ipos != pos:
+    def step(self, dt):
+        self.fpos += self.vel / dt
+
+        ipos = glm.ivec2(glm.floor(self.fpos))
+        movedCell = False
+        if ipos != self.ipos:
+            movedCell = True
+        self.ipos = ipos
+
+        self.surface.update(self)
+
+        if movedCell:
+            pos = glm.ivec2(self.fpos)
+            if len(self.tail) > 0:
+                frontCell = self.tail[0]
+                # something is causing duplicates to be added to the front triggering self intersection
+                if frontCell.face != self.face or frontCell.ipos != pos:
+                    self.tail = [Cell(self.face, pos)] + self.tail   #add new at front
+                    if len(self.tail) > self.length:
+                        self.tail = self.tail[:-1]      #remove last
+            else:
                 self.tail = [Cell(self.face, pos)] + self.tail   #add new at front
-                if len(self.tail) > self.length:
-                    self.tail = self.tail[:-1]      #remove last
-        else:
-            self.tail = [Cell(self.face, pos)] + self.tail   #add new at front
 
     def eat(self, food):
         for f in food:
@@ -87,14 +98,8 @@ class EndlessCubeSurface():
         p = glm.vec2(random.uniform(0, self.dims), random.uniform(0, self.dims))
         return Cell(f, p)
 
-    def update(self, mcell, dt):
-        mcell.fpos += mcell.vel / dt
-
-        ipos = glm.ivec2(glm.floor(mcell.fpos))
-        movedCell = False
-        if ipos != mcell.ipos:
-            movedCell = True
-        mcell.ipos = ipos
+    def update(self, mcell):
+        hasVel = issubclass(type(mcell), MovingCell)
 
         if (mcell.face == Face.BACK and mcell.ipos.x > self.dims):
             mcell.face = Face.LEFT
@@ -105,11 +110,13 @@ class EndlessCubeSurface():
         elif (mcell.face == Face.BACK and mcell.ipos.y > self.dims):
             mcell.face = Face.TOP
             mcell.fpos = glm.vec2(0, self.dims - mcell.ipos.x)
-            mcell.vel.x, mcell.vel.y = mcell.vel.y, -mcell.vel.x
+            if hasVel:
+                mcell.vel.x, mcell.vel.y = mcell.vel.y, -mcell.vel.x
         elif (mcell.face == Face.BACK and mcell.ipos.y < 0):
             mcell.face = Face.BOTTOM
             mcell.fpos = glm.vec2(0, mcell.ipos.x)
-            mcell.vel.x, mcell.vel.y = -mcell.vel.y, mcell.vel.x
+            if hasVel:
+                mcell.vel.x, mcell.vel.y = -mcell.vel.y, mcell.vel.x
 
         elif (mcell.face == Face.FRONT and mcell.ipos.x > self.dims):
             mcell.face = Face.RIGHT
@@ -120,11 +127,13 @@ class EndlessCubeSurface():
         elif (mcell.face == Face.FRONT and mcell.ipos.y > self.dims):
             mcell.face = Face.TOP
             mcell.fpos = glm.vec2(self.dims, mcell.ipos.x)
-            mcell.vel.x, mcell.vel.y = -mcell.vel.y, mcell.vel.x
+            if hasVel:
+                mcell.vel.x, mcell.vel.y = -mcell.vel.y, mcell.vel.x
         elif (mcell.face == Face.FRONT and mcell.ipos.y < 0):
             mcell.face = Face.BOTTOM
             mcell.fpos = glm.vec2(self.dims, self.dims - mcell.ipos.x)
-            mcell.vel.x, mcell.vel.y = mcell.vel.y, -mcell.vel.x
+            if hasVel:
+                mcell.vel.x, mcell.vel.y = mcell.vel.y, -mcell.vel.x
  
         elif (mcell.face == Face.LEFT and mcell.ipos.x > self.dims):
             mcell.face = Face.FRONT
@@ -148,24 +157,29 @@ class EndlessCubeSurface():
         elif (mcell.face == Face.RIGHT and mcell.ipos.y > self.dims):
             mcell.face = Face.TOP
             mcell.fpos = glm.vec2(self.dims - mcell.ipos.x, self.dims)
-            mcell.vel = -mcell.vel
+            if hasVel:
+                mcell.vel = -mcell.vel
         elif (mcell.face == Face.RIGHT and mcell.ipos.y < 0):
             mcell.face = Face.BOTTOM
             mcell.fpos = glm.vec2(self.dims - mcell.ipos.x, 0)
-            mcell.vel = -mcell.vel
+            if hasVel:
+                mcell.vel = -mcell.vel
 
         elif (mcell.face == Face.TOP and mcell.ipos.x > self.dims):
             mcell.face = Face.FRONT
             mcell.fpos = glm.vec2(mcell.ipos.y, self.dims)
-            mcell.vel.x, mcell.vel.y = mcell.vel.y, -mcell.vel.x
+            if hasVel:
+                mcell.vel.x, mcell.vel.y = mcell.vel.y, -mcell.vel.x
         elif (mcell.face == Face.TOP and mcell.ipos.x < 0):
             mcell.face = Face.BACK
             mcell.fpos = glm.vec2(self.dims - mcell.ipos.y, self.dims)
-            mcell.vel.x, mcell.vel.y = -mcell.vel.y, mcell.vel.x
+            if hasVel:
+                mcell.vel.x, mcell.vel.y = -mcell.vel.y, mcell.vel.x
         elif (mcell.face == Face.TOP and mcell.ipos.y > self.dims):
             mcell.face = Face.RIGHT
             mcell.fpos = glm.vec2(self.dims - mcell.ipos.x, self.dims)
-            mcell.vel = -mcell.vel
+            if hasVel:
+                mcell.vel = -mcell.vel
         elif (mcell.face == Face.TOP and mcell.ipos.y < 0):
             mcell.face = Face.LEFT
             mcell.fpos = glm.vec2(mcell.ipos.x, self.dims)
@@ -173,25 +187,25 @@ class EndlessCubeSurface():
         elif (mcell.face == Face.BOTTOM and mcell.ipos.x > self.dims):
             mcell.face = Face.FRONT
             mcell.fpos = glm.vec2(self.dims - mcell.ipos.y, 0)
-            mcell.vel.x, mcell.vel.y = -mcell.vel.y, mcell.vel.x
+            if hasVel:
+                mcell.vel.x, mcell.vel.y = -mcell.vel.y, mcell.vel.x
         elif (mcell.face == Face.BOTTOM and mcell.ipos.x < 0):
             mcell.face = Face.BACK
             mcell.fpos = glm.vec2(mcell.ipos.y, 0)
-            mcell.vel.x, mcell.vel.y = mcell.vel.y, -mcell.vel.x
+            if hasVel:
+                mcell.vel.x, mcell.vel.y = mcell.vel.y, -mcell.vel.x
         elif (mcell.face == Face.BOTTOM and mcell.ipos.y > self.dims):
             mcell.face = Face.LEFT
             mcell.fpos = glm.vec2(mcell.ipos.x, 0)
         elif (mcell.face == Face.BOTTOM and mcell.ipos.y < 0):
             mcell.face = Face.RIGHT
             mcell.fpos = glm.vec2(self.dims - mcell.ipos.x, 0)
-            mcell.vel = -mcell.vel
-
-        return movedCell
+            if hasVel:
+                mcell.vel = -mcell.vel
 
 class EndlessSurface(Application):
     def __init__(self):
         super().__init__(1280, 720, 60, 64)
-
         self.surface = EndlessCubeSurface(self.led_cube.size)
         self.snakes = []
         self.food = []
@@ -213,8 +227,7 @@ class EndlessSurface(Application):
             cube_faces[f.face, f.ipos.x, f.ipos.y] = [1, 1, 1]
 
         for s in self.snakes:
-            if self.surface.update(s, dt):
-                s.step()
+            s.step(dt)
             s.collide()
             s.eat(self.food)
             for i in range(len(s.tail)):
