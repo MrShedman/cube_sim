@@ -106,9 +106,12 @@ class Application():
         self.update(dt)
 
     def priv_render(self):
+        GL.glClearColor(0.2, 0.2, 0.2, 0)
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         MeshView(self.grid, self.shader, self.camera).render(True, False, True)
         self.render()
-
+        pg.display.flip()
+    
     def run(self):
         timeSinceLastUpdate = 0.0
         lastTime = time.time()
@@ -123,11 +126,7 @@ class Application():
                 timeSinceLastUpdate -= self.timePerFrame
                 self.priv_handleEvent()
                 self.priv_update(self.timePerFrame)
-
-            GL.glClearColor(0.2, 0.2, 0.2, 0)
-            GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-            self.priv_render()
-            pg.display.flip()
+                self.priv_render()
 
     def close(self, signum = 0, frame = 0):
         self.is_open = False
