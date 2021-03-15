@@ -47,7 +47,7 @@ class Application():
         GL.glLineWidth(1.0)
 
         self.is_open = True
-        self.timePerFrame = 1/hz
+        self.frameRate = hz
         signal.signal(signal.SIGINT, self.close)
 
         self.camera = CameraOrbit()
@@ -113,20 +113,14 @@ class Application():
         pg.display.flip()
     
     def run(self):
-        timeSinceLastUpdate = 0.0
-        lastTime = time.time()
-  
+        clock = pg.time.Clock()
+        dt = 1.0/self.frameRate
         # Start loop
         while self.is_open:
-            dt = time.time() - lastTime
-            lastTime = time.time()
-            timeSinceLastUpdate += dt
-
-            while timeSinceLastUpdate > self.timePerFrame:
-                timeSinceLastUpdate -= self.timePerFrame
-                self.priv_handleEvent()
-                self.priv_update(self.timePerFrame)
-                self.priv_render()
+            self.priv_handleEvent()
+            self.priv_update(dt)
+            self.priv_render()
+            dt = clock.tick(self.frameRate) * 0.001
 
     def close(self, signum = 0, frame = 0):
         self.is_open = False
