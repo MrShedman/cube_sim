@@ -74,7 +74,7 @@ class Glyph(MovingCell):
         return self.tail[i]
 
     def getColourFaded(self, i):
-        col = fadeColour(self.col, 1 - (i / self.length))
+        col = fadeColour(self.col, 1 - (i / self.length), 0.15)
         col[1] *= self.speckle[i]
         return col
 

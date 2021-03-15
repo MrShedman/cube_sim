@@ -77,7 +77,7 @@ class Snake(MovingCell):
         return self.tail[i]
 
     def getColourFaded(self, i):
-        return fadeColour(self.col, 1 - (i / self.length))
+        return fadeColour(self.col, 1 - (i / self.length), 0.15)
 
 class SnakeGame(Application):
     def __init__(self):
