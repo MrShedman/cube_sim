@@ -13,7 +13,7 @@ import math
 import random
 import time
 
-MAX_SPEED = 0.0075
+MAX_SPEED = 20
 
 class Glyph(MovingCell):
     def __init__(self, surface):
@@ -33,11 +33,11 @@ class Glyph(MovingCell):
         self.tail = list()
         self.speckle_strength = 0.8
         self.speckle_speed = 10
-        self.speckle_time = time.time() - self.speckle_speed
+        self.speckle_time = 0.0
         self.genSpeckle()
 
     def step(self, dt):
-        self.fpos += self.vel / dt
+        self.fpos += self.vel * dt
 
         if self.surface.update(self):
             self.tail = [Cell(self.face, self.ipos, self.col)] + self.tail   #add new at front
@@ -62,7 +62,7 @@ class Matrix(Application):
         super().__init__(1280, 720, 60, 64)
         self.surface = EndlessSurface(self.led_cube.size)
         self.glyphs = []
-        for i in range(500):
+        for i in range(100):
             self.glyphs.append(Glyph(self.surface))
 
     def update(self, dt):

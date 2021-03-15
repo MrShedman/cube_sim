@@ -12,7 +12,7 @@ import glm
 import math
 import random
 
-MAX_SPEED = 0.0075
+MAX_SPEED = 20.0
 
 class Snake(MovingCell):
     def __init__(self, surface):
@@ -32,7 +32,7 @@ class Snake(MovingCell):
         self.tail = list()
 
     def step(self, dt):
-        self.fpos += self.vel / dt
+        self.fpos += self.vel * dt
 
         if self.surface.update(self):
             self.tail = [Cell(self.face, self.ipos)] + self.tail   #add new at front
