@@ -6,9 +6,10 @@ import glm
 import random
 
 class Cell():
-    def __init__(self, face, pos):
+    def __init__(self, face, pos, col = glm.vec3(1, 1, 1)):
         self.ipos = glm.ivec2(pos)
         self.face = face
+        self.col = col
 
 class MovingCell(Cell):
     def __init__(self, face, pos, vel):
@@ -27,6 +28,12 @@ class EndlessSurface():
 
     def update(self, mcell):
         hasVel = issubclass(type(mcell), MovingCell)
+
+        ipos = glm.ivec2(glm.floor(mcell.fpos))
+        movedCell = False
+        if ipos != mcell.ipos:
+            movedCell = True
+        mcell.ipos = ipos
 
         if (mcell.face == Face.BACK and mcell.ipos.x > self.dims):
             mcell.face = Face.LEFT
@@ -129,3 +136,6 @@ class EndlessSurface():
             mcell.fpos = glm.vec2(self.dims - mcell.ipos.x, 0)
             if hasVel:
                 mcell.vel = -mcell.vel
+        
+        mcell.ipos = glm.ivec2(mcell.fpos)
+        return movedCell

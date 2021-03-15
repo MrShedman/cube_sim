@@ -28,31 +28,18 @@ class Snake(MovingCell):
 
         super().__init__(f, p, v)
         self.col = genRandomStrongColour()
-        self.length = random.randint(2, 4)
+        self.length = random.randint(10, 20)
         self.tail = list()
 
     def step(self, dt):
         self.fpos += self.vel / dt
 
-        ipos = glm.ivec2(glm.floor(self.fpos))
-        movedCell = False
-        if ipos != self.ipos:
-            movedCell = True
-        self.ipos = ipos
-
-        self.surface.update(self)
-
-        if movedCell:
-            pos = glm.ivec2(self.fpos)
-            if len(self.tail) > 0:
-                frontCell = self.tail[0]
-                # something is causing duplicates to be added to the front triggering self intersection
-                if frontCell.face != self.face or frontCell.ipos != pos:
-                    self.tail = [Cell(self.face, pos)] + self.tail   #add new at front
-                    if len(self.tail) > self.length:
-                        self.tail = self.tail[:-1]      #remove last
-            else:
-                self.tail = [Cell(self.face, pos)] + self.tail   #add new at front
+        if self.surface.update(self):
+            self.tail = [Cell(self.face, self.ipos)] + self.tail   #add new at front
+            if len(self.tail) > self.length:
+                self.tail = self.tail[:-1]      #remove last
+            for i, c in enumerate(self.tail):
+                c.col = fadeColour(self.col, 1 - (i / self.length), 0.15)
 
     def eat(self, food):
         for f in food:
@@ -61,23 +48,15 @@ class Snake(MovingCell):
                 food.remove(f)
 
     def left(self):
-        t = glm.rotate(glm.mat4(1), math.pi/2, glm.vec3(0, 0, 1))
-        self.vel = (glm.vec4(self.vel, 0, 0) * t).xy
+        self.vel *= glm.mat2x2([[0, 1], [-1, 0]])
  
     def right(self):
-        t = glm.rotate(glm.mat4(1), -math.pi/2, glm.vec3(0, 0, 1))
-        self.vel = (glm.vec4(self.vel, 0, 0) * t).xy
+        self.vel *= glm.mat2x2([[0, -1], [1, 0]])
 
     def collide(self):
         for c in self.tail[1:]: # the tail also contains the head
             if self.face == c.face and self.ipos == c.ipos:
                 self.__init__(self.surface)
-
-    def getPosition(self, i):
-        return self.tail[i]
-
-    def getColourFaded(self, i):
-        return fadeColour(self.col, 1 - (i / self.length), 0.15)
 
 class SnakeGame(Application):
     def __init__(self):
@@ -100,15 +79,14 @@ class SnakeGame(Application):
         cube_faces = self.led_cube.getCubeArrayAsColour([0.1, 0.1, 0.1])
 
         for f in self.food:
-            cube_faces[f.face, f.ipos.x, f.ipos.y] = [1, 1, 1]
+            cube_faces[f.face, f.ipos.x, f.ipos.y] = f.col
 
         for s in self.snakes:
             s.step(dt)
             s.collide()
             s.eat(self.food)
-            for i in range(len(s.tail)):
-                cell = s.getPosition(i)
-                cube_faces[cell.face, cell.ipos.x, cell.ipos.y] = s.getColourFaded(i)
+            for c in s.tail:
+                cube_faces[c.face, c.ipos.x, c.ipos.y] = c.col
 
         self.led_cube.updateFaces(cube_faces)
         self.led_cube.update()

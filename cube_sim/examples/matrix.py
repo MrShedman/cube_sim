@@ -31,6 +31,7 @@ class Glyph(MovingCell):
         self.col = glm.vec3(0, 1, 0)
         self.length = random.randint(8, 25)
         self.tail = list()
+        self.speckle_strength = 0.8
         self.speckle_speed = 10
         self.speckle_time = time.time() - self.speckle_speed
         self.genSpeckle()
@@ -38,27 +39,10 @@ class Glyph(MovingCell):
     def step(self, dt):
         self.fpos += self.vel / dt
 
-        ipos = glm.ivec2(glm.floor(self.fpos))
-        movedCell = False
-        if ipos != self.ipos:
-            movedCell = True
-        self.ipos = ipos
-
-        self.surface.update(self)
-
-        if movedCell:
-            pos = glm.ivec2(self.fpos)
-            if len(self.tail) > 0:
-                frontCell = self.tail[0]
-                # something is causing duplicates to be added to the front triggering self intersection
-                if frontCell.face != self.face or frontCell.ipos != pos:
-                    self.tail = [Cell(self.face, pos)] + self.tail   #add new at front
-                    if len(self.tail) > self.length:
-                        self.tail = self.tail[:-1]      #remove last
-            else:
-                self.tail = [Cell(self.face, pos)] + self.tail   #add new at front
-        
-        if len(self.tail) > 0:
+        if self.surface.update(self):
+            self.tail = [Cell(self.face, self.ipos, self.col)] + self.tail   #add new at front
+            if len(self.tail) > self.length:
+                self.tail = self.tail[:-1]      #remove last
             if self.tail[-1].face == Face.BOTTOM:
                 self.__init__(self.surface)
 
@@ -67,37 +51,34 @@ class Glyph(MovingCell):
     def genSpeckle(self):
         tnow = time.time()
         if (tnow - self.speckle_time) > 1.0/self.speckle_speed:        
-            self.speckle = np.random.random_sample(self.length) * (1 - 0.5) + 0.5
+            self.speckle = np.random.random_sample(self.length) * self.speckle_strength + (1 - self.speckle_strength)
             self.speckle_time = tnow
-
-    def getPosition(self, i):
-        return self.tail[i]
-
-    def getColourFaded(self, i):
-        col = fadeColour(self.col, 1 - (i / self.length), 0.15)
-        col[1] *= self.speckle[i]
-        return col
+            for i, c in enumerate(self.tail):
+                fade = (1 - (i / self.length)) *  self.speckle[i]
+                c.col = glm.vec3(fadeColour(self.col, fade, 0.15))
 
 class Matrix(Application):
     def __init__(self):
         super().__init__(1280, 720, 60, 64)
         self.surface = EndlessSurface(self.led_cube.size)
         self.glyphs = []
-        for i in range(200):
+        for i in range(500):
             self.glyphs.append(Glyph(self.surface))
 
     def update(self, dt):
+        t0 = time.time()
         cube_faces = self.led_cube.getCubeArrayAsColour([0.1, 0.1, 0.1])
 
         for g in self.glyphs:
             g.step(dt)
-            for i in range(len(g.tail)):
-                cell = g.getPosition(i)
-                if cell.face != Face.TOP:
-                    cube_faces[cell.face, cell.ipos.x, cell.ipos.y] = g.getColourFaded(i)
+            for cell in g.tail:
+                if cell.face is not Face.TOP and cell.face is not Face.BOTTOM:
+                    cube_faces[cell.face, cell.ipos.x, cell.ipos.y] = cell.col
 
         self.led_cube.updateFaces(cube_faces)
         self.led_cube.update()
+        t1 = time.time()
+        print((t1-t0)*1000)
 
 if __name__ == "__main__":
     app = Matrix()
