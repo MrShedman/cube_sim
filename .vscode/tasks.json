@@ -14,7 +14,7 @@
                 "reveal": "always"
             },
 
-            "args": ["-m", "cube_sim.examples.snake"]
+            "args": ["-m", "cube_sim.examples.matrix"]
         }
     ]
 }
