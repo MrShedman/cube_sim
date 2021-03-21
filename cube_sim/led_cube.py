@@ -42,6 +42,11 @@ class LEDCube(Transform):
     def updateFaces(self, colours):
         self.mesh.colours = np.repeat(colours.reshape(6 * self.size * self.size, 3), 6, axis=0)
 
+    def setOutlineColour(self, colour):
+        shape = (self.size * (self.size + 1) * 4 * 6, 3)
+        self.mesh_outline.colours = np.full(shape, [colour]).astype(np.float32)
+        self.mesh_outline.updateColours()
+
     def getFaceArrayAsColour(self, colour):
         shape = (self.size, self.size, 3)
         return np.full(shape, [colour]).astype(np.float32)

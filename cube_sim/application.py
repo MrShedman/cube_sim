@@ -47,7 +47,7 @@ class Application():
         GL.glLineWidth(1.0)
 
         self.is_open = True
-        self.timePerFrame = 1/hz
+        self.frameRate = hz
         signal.signal(signal.SIGINT, self.close)
 
         self.camera = CameraOrbit()
@@ -106,28 +106,21 @@ class Application():
         self.update(dt)
 
     def priv_render(self):
+        GL.glClearColor(0.2, 0.2, 0.2, 0)
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         MeshView(self.grid, self.shader, self.camera).render(True, False, True)
         self.render()
-
+        pg.display.flip()
+    
     def run(self):
-        timeSinceLastUpdate = 0.0
-        lastTime = time.time()
-  
+        clock = pg.time.Clock()
+        dt = 1.0/self.frameRate
         # Start loop
         while self.is_open:
-            dt = time.time() - lastTime
-            lastTime = time.time()
-            timeSinceLastUpdate += dt
-
-            while timeSinceLastUpdate > self.timePerFrame:
-                timeSinceLastUpdate -= self.timePerFrame
-                self.priv_handleEvent()
-                self.priv_update(self.timePerFrame)
-
-            GL.glClearColor(0.2, 0.2, 0.2, 0)
-            GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+            self.priv_handleEvent()
+            self.priv_update(dt)
             self.priv_render()
-            pg.display.flip()
+            dt = clock.tick(self.frameRate) * 0.001
 
     def close(self, signum = 0, frame = 0):
         self.is_open = False

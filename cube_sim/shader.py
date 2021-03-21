@@ -8,7 +8,7 @@ from cube_sim.resource import getResource
 
 class Shader():
     def __init__(self, vertexFilename, fragmentFilename):
-        self.load(getResource(vertexFilename), getResource(fragmentFilename))
+        self.load(vertexFilename, fragmentFilename)
         self.uniforms = dict()
 
     def __del__(self):
@@ -27,41 +27,32 @@ class Shader():
         GL.glUseProgram(None)
 
     def load(self, vertexFilename, fragmentFilename):
-        vertex_code = open(vertexFilename, 'r').read()
-        fragment_code = open(fragmentFilename, 'r').read()
-
         self.program = GL.glCreateProgram()
-        vertex = GL.glCreateShader(GL.GL_VERTEX_SHADER)
-        fragment = GL.glCreateShader(GL.GL_FRAGMENT_SHADER)
-        GL.glShaderSource(vertex, vertex_code)
-        GL.glCompileShader(vertex)
+        vertex = self.compile(GL.GL_VERTEX_SHADER, vertexFilename)
+        fragment = self.compile(GL.GL_FRAGMENT_SHADER, fragmentFilename)
 
-        # this logs issues the shader compiler finds.
-        log = GL.glGetShaderInfoLog(vertex)
-        if isinstance(log, bytes):
-            log = log.decode()
-        if len(log) > 0:
-            for line in log.split("\n"):
-                print(line)
-
-        GL.glAttachShader(self.program, vertex)
-        GL.glShaderSource(fragment, fragment_code)
-        GL.glCompileShader(fragment)
-
-        # this logs issues the shader compiler finds.
-        log = GL.glGetShaderInfoLog(fragment)
-        if isinstance(log, bytes):
-            log = log.decode()
-        if len(log) > 0:
-            for line in log.split("\n"):
-                print(line)
-
-        GL.glAttachShader(self.program, fragment)
         GL.glValidateProgram(self.program)
         GL.glLinkProgram(self.program)
 
         GL.glDetachShader(self.program, vertex)
         GL.glDetachShader(self.program, fragment)
+
+    def compile(self, shader_type, file):
+        shader_code = open(getResource(file), 'r').read()
+        shader_obj = GL.glCreateShader(shader_type)
+        GL.glShaderSource(shader_obj, shader_code)
+        GL.glCompileShader(shader_obj)
+
+        # this logs issues the shader compiler finds.
+        log = GL.glGetShaderInfoLog(shader_obj)
+        if isinstance(log, bytes):
+            log = log.decode()
+        if len(log) > 0:
+            for line in log.split("\n"):
+                print(line)
+
+        GL.glAttachShader(self.program, shader_obj)
+        return shader_obj
 
     def isLinked(self):
         return GL.glGetProgramiv(self.program, GL.GL_LINK_STATUS, None) == 1
